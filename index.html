@@ -1753,6 +1753,12 @@ input[type=number] {
                     <li><a href="#community" class="nav-link">Community</a></li>
                 </ul>
             </div>
+            <div class="nav-auth" style="display: flex; gap: 10px; align-items: center;">
+                <span id="userDisplay" style="color: #a0a0a0; font-size: 0.85rem;">Guest</span>
+                <button id="loginBtn" class="nav-link" style="background: transparent; border: 1px solid #667eea; cursor: pointer;">Login</button>
+                <button id="signupBtn" class="nav-link" style="background: #667eea; cursor: pointer;">Sign Up</button>
+                <button id="logoutBtn" class="nav-link" style="display: none; background: #f44336; cursor: pointer;">Logout</button>
+            </div>
         </nav>
         
         <div id="root">
@@ -1982,6 +1988,12 @@ input[type=number] {
                                     <h3>Trading Performance Chart</h3>
                                     <p>Real-time trading analytics will appear here</p>
                                     <button class="btn btn-primary" style="margin-top: 20px;">Connect Trading Account</button>
+                                </div>
+                            </div>
+                            <div class="positions-panel" style="background: #1a1a2e; border-radius: 12px; padding: 20px; margin-top: 20px;">
+                                <h3>Open Positions</h3>
+                                <div id="positionsList">
+                                    <p style="color: #a0a0a0;">No open positions</p>
                                 </div>
                             </div>
                         </div>
@@ -2686,7 +2698,412 @@ cropperjs/dist/cropper.css:
 <script type="text/javascript" id="" charset="">!function(a,b){if(!a.m2oe){var c=a.m2oe=function(d,e,f){c.actionQueue.push({action:d,actionValue:e,params:f})};c.actionQueue=[];a=b.createElement("script");a.async=!0;a.src="https://cdn0.match2one.net/tracking/m2oe.js";b=b.getElementsByTagName("head")[0];b.insertBefore(a,b.firstChild)}}(window,document);m2oe("init","PageView",{tag_id:116,segment_key:"match2one-132"});m2oe("init","Lead",{tag_id:915,segment_key:"match2one-926"});m2oe("init","SignUp",{tag_id:908,segment_key:"match2one-919"});
 m2oe("init","FirstTimeDeposit",{tag_id:727,segment_key:"match2one-736"});</script>
 <script type="text/javascript" id="" charset="">m2oe("event","PageView");</script>
-<script type="text/javascript" id="" charset="">(function(){try{window.setTimeout(function(){dataLayer.push({event:"done_loading"})},2E3)}catch(a){}})();</script><div class="blocklyWidgetDiv"></div><div class="blocklyDropDownDiv" style="opacity: 0; transition: transform 0.25s, opacity 0.25s; transform: translate(0px, 0px);"><div class="blocklyDropDownContent"></div><div class="blocklyDropDownArrow"></div></div><div class="blocklyTooltipDiv"></div><canvas class="blocklyComputeCanvas"></canvas></body></html>
+<script type="text/javascript" id="" charset="">(function(){try{window.setTimeout(function(){dataLayer.push({event:"done_loading"})},2E3)}catch(a){}})();</script><div class="blocklyWidgetDiv"></div><div class="blocklyDropDownDiv" style="opacity: 0; transition: transform 0.25s, opacity 0.25s; transform: translate(0px, 0px);"><div class="blocklyDropDownContent"></div><div class="blocklyDropDownArrow"></div></div><div class="blocklyTooltipDiv"></div><canvas class="blocklyComputeCanvas"></canvas><!-- Trading Functionality Script -->
+<script>
+// API Configuration
+const API_BASE = window.location.origin.includes('localhost') ? 'http://localhost:3001' : '';
+
+// Global state
+let currentUser = null;
+let authToken = localStorage.getItem('authToken');
+let ws = null;
+let currentPrices = {};
+let openTrades = [];
+
+// Initialize
+document.addEventListener('DOMContentLoaded', () => {
+    initAuth();
+    initWebSocket();
+    updateUI();
+    
+    // Set up periodic updates
+    setInterval(updateDashboard, 5000);
+});
+
+// Auth Functions
+function initAuth() {
+    if (authToken) {
+        fetchUserProfile();
+    }
+    
+    // Auth modal handlers
+    const loginBtn = document.getElementById('loginBtn');
+    const signupBtn = document.getElementById('signupBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    
+    if (loginBtn) loginBtn.addEventListener('click', showLoginModal);
+    if (signupBtn) signupBtn.addEventListener('click', showSignupModal);
+    if (logoutBtn) logoutBtn.addEventListener('click', logout);
+}
+
+async function fetchUserProfile() {
+    try {
+        const response = await fetch(`${API_BASE}/api/user/profile`, {
+            headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        
+        if (response.ok) {
+            currentUser = await response.json();
+            updateUI();
+        } else {
+            logout();
+        }
+    } catch (error) {
+        console.error('Failed to fetch profile:', error);
+    }
+}
+
+async function login(email, password) {
+    try {
+        const response = await fetch(`${API_BASE}/api/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            authToken = data.token;
+            currentUser = data;
+            localStorage.setItem('authToken', authToken);
+            updateUI();
+            closeAuthModal();
+            return { success: true };
+        } else {
+            return { success: false, error: data.error };
+        }
+    } catch (error) {
+        return { success: false, error: 'Network error' };
+    }
+}
+
+async function register(name, email, password) {
+    try {
+        const response = await fetch(`${API_BASE}/api/auth/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, email, password })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            authToken = data.token;
+            currentUser = { ...data, balance: 10000, demo_balance: 100000 };
+            localStorage.setItem('authToken', authToken);
+            updateUI();
+            closeAuthModal();
+            return { success: true };
+        } else {
+            return { success: false, error: data.error };
+        }
+    } catch (error) {
+        return { success: false, error: 'Network error' };
+    }
+}
+
+function logout() {
+    authToken = null;
+    currentUser = null;
+    localStorage.removeItem('authToken');
+    if (ws) ws.close();
+    updateUI();
+}
+
+// WebSocket for real-time prices
+function initWebSocket() {
+    const wsUrl = window.location.protocol === 'https:' 
+        ? `wss://${window.location.host}` 
+        : `ws://${window.location.host}`;
+    
+    ws = new WebSocket(wsUrl);
+    
+    ws.onopen = () => console.log('WebSocket connected');
+    
+    ws.onmessage = (event) => {
+        const message = JSON.parse(event.data);
+        if (message.type === 'price_update') {
+            currentPrices = message.data;
+            updatePriceDisplay();
+        }
+    };
+    
+    ws.onclose = () => {
+        console.log('WebSocket disconnected, retrying...');
+        setTimeout(initWebSocket, 3000);
+    };
+}
+
+// Trading Functions
+async function openTrade(symbol, side, amount, type = 'market') {
+    if (!authToken) {
+        showLoginModal();
+        return { success: false, error: 'Please login first' };
+    }
+    
+    try {
+        const response = await fetch(`${API_BASE}/api/trades/open`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`
+            },
+            body: JSON.stringify({
+                symbol,
+                side,
+                amount: parseFloat(amount),
+                type,
+                is_demo: currentUser?.is_demo !== false
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            fetchOpenTrades();
+            updateBalance();
+            return { success: true, trade: data };
+        } else {
+            return { success: false, error: data.error };
+        }
+    } catch (error) {
+        return { success: false, error: 'Network error' };
+    }
+}
+
+async function closeTrade(tradeId) {
+    if (!authToken) return { success: false, error: 'Not authenticated' };
+    
+    try {
+        const response = await fetch(`${API_BASE}/api/trades/close`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`
+            },
+            body: JSON.stringify({ tradeId })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            fetchOpenTrades();
+            updateBalance();
+            return { success: true, result: data };
+        } else {
+            return { success: false, error: data.error };
+        }
+    } catch (error) {
+        return { success: false, error: 'Network error' };
+    }
+}
+
+async function fetchOpenTrades() {
+    if (!authToken) return;
+    
+    try {
+        const response = await fetch(`${API_BASE}/api/trades/open`, {
+            headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        
+        if (response.ok) {
+            openTrades = await response.json();
+            updatePositionsDisplay();
+        }
+    } catch (error) {
+        console.error('Failed to fetch trades:', error);
+    }
+}
+
+async function updateBalance() {
+    if (!authToken) return;
+    await fetchUserProfile();
+}
+
+// UI Updates
+function updateUI() {
+    // Update auth buttons
+    const loginBtn = document.getElementById('loginBtn');
+    const signupBtn = document.getElementById('signupBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const userDisplay = document.getElementById('userDisplay');
+    
+    if (currentUser) {
+        if (loginBtn) loginBtn.style.display = 'none';
+        if (signupBtn) signupBtn.style.display = 'none';
+        if (logoutBtn) logoutBtn.style.display = 'inline-block';
+        if (userDisplay) {
+            const balance = currentUser.is_demo ? currentUser.demo_balance : currentUser.balance;
+            userDisplay.innerHTML = `${currentUser.name} | $${balance?.toFixed(2) || '0.00'} ${currentUser.is_demo ? '(Demo)' : ''}`;
+        }
+    } else {
+        if (loginBtn) loginBtn.style.display = 'inline-block';
+        if (signupBtn) signupBtn.style.display = 'inline-block';
+        if (logoutBtn) logoutBtn.style.display = 'none';
+        if (userDisplay) userDisplay.innerHTML = 'Guest';
+    }
+    
+    updateDashboard();
+}
+
+function updatePriceDisplay() {
+    // Update any price elements on the page
+    document.querySelectorAll('[data-symbol]').forEach(el => {
+        const symbol = el.getAttribute('data-symbol');
+        if (currentPrices[symbol]) {
+            el.textContent = currentPrices[symbol].price.toFixed(5);
+            const change = currentPrices[symbol].change;
+            el.className = change >= 0 ? 'price-up' : 'price-down';
+        }
+    });
+}
+
+function updatePositionsDisplay() {
+    const positionsContainer = document.getElementById('positionsList');
+    if (!positionsContainer) return;
+    
+    if (openTrades.length === 0) {
+        positionsContainer.innerHTML = '<p style="color: #a0a0a0;">No open positions</p>';
+        return;
+    }
+    
+    let html = '';
+    let totalPL = 0;
+    
+    openTrades.forEach(trade => {
+        const pl = trade.current_pl || 0;
+        totalPL += pl;
+        const plClass = pl >= 0 ? 'positive' : 'negative';
+        
+        html += `
+            <div class="position-item" style="padding: 10px; border-bottom: 1px solid #333;">
+                <div style="display: flex; justify-content: space-between;">
+                    <span><strong>${trade.symbol}</strong> ${trade.side.toUpperCase()}</span>
+                    <span class="${plClass}">${pl >= 0 ? '+' : ''}$${pl.toFixed(2)}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; color: #a0a0a0; font-size: 12px;">
+                    <span>Amount: $${trade.amount}</span>
+                    <span>Entry: ${trade.entry_price?.toFixed(5)}</span>
+                </div>
+                <button onclick="closeTrade('${trade.id}').then(r => alert(r.success ? 'Trade closed!' : r.error))" 
+                    class="btn btn-primary" style="margin-top: 8px; padding: 4px 12px; font-size: 12px;">Close</button>
+            </div>
+        `;
+    });
+    
+    const totalClass = totalPL >= 0 ? 'positive' : 'negative';
+    html = `<div style="margin-bottom: 15px; font-weight: bold;">Total P/L: <span class="${totalClass}">${totalPL >= 0 ? '+' : ''}$${totalPL.toFixed(2)}</span></div>` + html;
+    
+    positionsContainer.innerHTML = html;
+}
+
+function updateDashboard() {
+    fetchOpenTrades();
+    
+    // Update any stat cards with real data
+    if (currentUser) {
+        const balanceEl = document.getElementById('accountBalance');
+        if (balanceEl) {
+            const balance = currentUser.is_demo ? currentUser.demo_balance : currentUser.balance;
+            balanceEl.textContent = `$${balance?.toLocaleString() || '0'}`;
+        }
+    }
+}
+
+// Modal Functions
+function showLoginModal() {
+    const modal = document.createElement('div');
+    modal.id = 'authModal';
+    modal.className = 'modal';
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width: 400px; padding: 30px;">
+            <span class="close" onclick="closeAuthModal()" style="cursor: pointer; float: right; font-size: 24px;">&times;</span>
+            <h2>Login</h2>
+            <input type="email" id="loginEmail" placeholder="Email" style="width: 100%; margin: 10px 0; padding: 12px;">
+            <input type="password" id="loginPassword" placeholder="Password" style="width: 100%; margin: 10px 0; padding: 12px;">
+            <button onclick="handleLogin()" class="btn btn-primary" style="width: 100%;">Login</button>
+            <p style="margin-top: 15px; text-align: center;">
+                Don't have an account? <a href="#" onclick="showSignupModal(); return false;">Sign up</a>
+            </p>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    modal.style.display = 'flex';
+}
+
+function showSignupModal() {
+    closeAuthModal();
+    const modal = document.createElement('div');
+    modal.id = 'authModal';
+    modal.className = 'modal';
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width: 400px; padding: 30px;">
+            <span class="close" onclick="closeAuthModal()" style="cursor: pointer; float: right; font-size: 24px;">&times;</span>
+            <h2>Sign Up</h2>
+            <input type="text" id="signupName" placeholder="Full Name" style="width: 100%; margin: 10px 0; padding: 12px;">
+            <input type="email" id="signupEmail" placeholder="Email" style="width: 100%; margin: 10px 0; padding: 12px;">
+            <input type="password" id="signupPassword" placeholder="Password" style="width: 100%; margin: 10px 0; padding: 12px;">
+            <button onclick="handleSignup()" class="btn btn-primary" style="width: 100%;">Sign Up</button>
+            <p style="margin-top: 15px; text-align: center;">
+                Already have an account? <a href="#" onclick="showLoginModal(); return false;">Login</a>
+            </p>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    modal.style.display = 'flex';
+}
+
+function closeAuthModal() {
+    const modal = document.getElementById('authModal');
+    if (modal) modal.remove();
+}
+
+async function handleLogin() {
+    const email = document.getElementById('loginEmail')?.value;
+    const password = document.getElementById('loginPassword')?.value;
+    
+    if (!email || !password) {
+        alert('Please fill in all fields');
+        return;
+    }
+    
+    const result = await login(email, password);
+    if (!result.success) {
+        alert(result.error);
+    }
+}
+
+async function handleSignup() {
+    const name = document.getElementById('signupName')?.value;
+    const email = document.getElementById('signupEmail')?.value;
+    const password = document.getElementById('signupPassword')?.value;
+    
+    if (!name || !email || !password) {
+        alert('Please fill in all fields');
+        return;
+    }
+    
+    const result = await register(name, email, password);
+    if (!result.success) {
+        alert(result.error);
+    }
+}
+
+// Quick trade helper
+window.quickTrade = async function(symbol, side) {
+    const amount = prompt(`Enter amount to ${side} ${symbol}:`, '100');
+    if (!amount || isNaN(amount)) return;
+    
+    const result = await openTrade(symbol, side, amount);
+    if (result.success) {
+        alert(`Trade opened! ID: ${result.trade.tradeId}`);
+    } else {
+        alert('Error: ' + result.error);
+    }
+};
+</script>
+</body></html>
 
 
 
