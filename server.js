@@ -14,7 +14,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'lian-traders-secret-key';
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname)));
+// Note: Static files served by Netlify, not backend
 
 // Database setup
 const db = new sqlite3.Database('./trading.db', (err) => {
