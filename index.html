@@ -2700,8 +2700,10 @@ m2oe("init","FirstTimeDeposit",{tag_id:727,segment_key:"match2one-736"});</scrip
 <script type="text/javascript" id="" charset="">m2oe("event","PageView");</script>
 <script type="text/javascript" id="" charset="">(function(){try{window.setTimeout(function(){dataLayer.push({event:"done_loading"})},2E3)}catch(a){}})();</script><div class="blocklyWidgetDiv"></div><div class="blocklyDropDownDiv" style="opacity: 0; transition: transform 0.25s, opacity 0.25s; transform: translate(0px, 0px);"><div class="blocklyDropDownContent"></div><div class="blocklyDropDownArrow"></div></div><div class="blocklyTooltipDiv"></div><canvas class="blocklyComputeCanvas"></canvas><!-- Trading Functionality Script -->
 <script>
-// API Configuration
-const API_BASE = window.location.origin.includes('localhost') ? 'http://localhost:3001' : '';
+// API Configuration - Backend URL (Render.com deployment)
+const API_BASE = window.location.origin.includes('localhost') 
+    ? 'http://localhost:3001' 
+    : 'https://lian-traders-api.onrender.com';
 
 // Global state
 let currentUser = null;
