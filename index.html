@@ -2776,7 +2776,8 @@ async function login(email, password) {
             return { success: false, error: data.error };
         }
     } catch (error) {
-        return { success: false, error: 'Network error' };
+        console.error('Login error:', error);
+        return { success: false, error: 'Network error: Cannot connect to server. Please try again in 30 seconds (backend may be waking up).' };
     }
 }
 
@@ -2801,7 +2802,8 @@ async function register(name, email, password) {
             return { success: false, error: data.error };
         }
     } catch (error) {
-        return { success: false, error: 'Network error' };
+        console.error('Register error:', error);
+        return { success: false, error: 'Network error: Cannot connect to server. Please try again in 30 seconds (backend may be waking up).' };
     }
 }
 
@@ -2815,9 +2817,7 @@ function logout() {
 
 // WebSocket for real-time prices
 function initWebSocket() {
-    const wsUrl = window.location.protocol === 'https:' 
-        ? `wss://${window.location.host}` 
-        : `ws://${window.location.host}`;
+    const wsUrl = API_BASE.replace('http://', 'ws://').replace('https://', 'wss://');
     
     ws = new WebSocket(wsUrl);
     
