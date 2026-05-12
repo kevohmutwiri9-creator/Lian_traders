@@ -1,0 +1,48 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "remove": "Remove",
+    "close": "Close",
+    "open": "Open",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "continue": "Continue",
+    "finish": "Finish",
+    "retry": "Retry",
+    "refresh": "Refresh"
+  },
+  "trading": {
+    "buy": "Buy",
+    "sell": "Sell",
+    "trade": "Trade",
+    "trades": "Trades",
+    "balance": "Balance",
+    "profit": "Profit",
+    "loss": "Loss",
+    "volume": "Volume",
+    "price": "Price",
+    "amount": "Amount",
+    "symbol": "Symbol",
+    "market": "Market",
+    "order": "Order",
+    "orders": "Orders"
+  },
+  "navigation": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "settings": "Settings",
+    "profile": "Profile",
+    "logout": "Logout",
+    "login": "Login",
+    "register": "Register"
+  }
+}
