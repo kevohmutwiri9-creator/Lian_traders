@@ -6,15 +6,27 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
 const path = require('path');
+const axios = require('axios');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 const JWT_SECRET = process.env.JWT_SECRET || 'lian-traders-secret-key';
 
+// Binary/Deriv API Configuration
+const DERIV_APP_ID = 70590;
+const DERIV_API_URL = 'https://api.derivws.com';
+
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: [
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
+    'https://lian-traders.netlify.app',
+    'https://www.lian-traders.com'
+  ],
+  credentials: true
+}));
 app.use(express.json());
-// Note: Static files served by Netlify, not backend
 
 // Database setup
 const db = new sqlite3.Database('./trading.db', (err) => {
@@ -378,14 +390,97 @@ app.get('/api/trades/history', authenticateToken, (req, res) => {
   );
 });
 
-// Trading bot routes
-let botStatus = {
-  active: false,
-  strategy: 'none',
-  symbol: 'EUR/USD',
-  trades_today: 0,
-  profit_today: 0
-};
+// Binary/Deriv API proxy endpoints
+app.post('/api/deriv/authorize', authenticateToken, async (req, res) => {
+  try {
+    const { token } = req.body;
+    const response = await axios.post(`${DERIV_API_URL}/authorize`, {
+      authorize: token,
+      app_id: DERIV_APP_ID
+    });
+    res.json(response.data);
+  } catch (error) {
+    res.status(500).json({ error: 'Deriv API error', details: error.message });
+  }
+});
+
+app.post('/api/deriv/balance', authenticateToken, async (req, res) => {
+  try {
+    const { token } = req.body;
+    const response = await axios.post(`${DERIV_API_URL}/balance`, {
+      balance: 1,
+      app_id: DERIV_APP_ID
+    }, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    res.json(response.data);
+  } catch (error) {
+    res.status(500).json({ error: 'Deriv API error', details: error.message });
+  }
+});
+
+app.post('/api/deriv/portfolio', authenticateToken, async (req, res) => {
+  try {
+    const { token } = req.body;
+    const response = await axios.post(`${DERIV_API_URL}/portfolio`, {
+      portfolio: 1,
+      app_id: DERIV_APP_ID
+    }, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    res.json(response.data);
+  } catch (error) {
+    res.status(500).json({ error: 'Deriv API error', details: error.message });
+  }
+});
+
+app.post('/api/deriv/buy', authenticateToken, async (req, res) => {
+  try {
+    const { token, contract_type, symbol, duration, duration_unit, amount, barrier, basis } = req.body;
+    const response = await axios.post(`${DERIV_API_URL}/buy`, {
+      buy: 1,
+      parameters: {
+        contract_type,
+        symbol,
+        duration,
+        duration_unit,
+        amount,
+        barrier,
+        basis: basis || 'stake'
+      },
+      app_id: DERIV_APP_ID
+    }, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    res.json(response.data);
+  } catch (error) {
+    res.status(500).json({ error: 'Deriv API error', details: error.message });
+  }
+});
+
+app.post('/api/deriv/sell', authenticateToken, async (req, res) => {
+  try {
+    const { token, contract_id, price } = req.body;
+    const response = await axios.post(`${DERIV_API_URL}/sell`, {
+      sell: contract_id,
+      price: price || 0,
+      app_id: DERIV_APP_ID
+    }, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    res.json(response.data);
+  } catch (error) {
+    res.status(500).json({ error: 'Deriv API error', details: error.message });
+  }
+});
+
+// WebSocket proxy for real-time data
+app.get('/api/deriv/ws', (req, res) => {
+  res.json({
+    ws_url: `wss://ws.derivws.com/websockets/v3?app_id=${DERIV_APP_ID}`,
+    app_id: DERIV_APP_ID
+  });
+});
 
 app.get('/api/bot/status', authenticateToken, (req, res) => {
   res.json(botStatus);
@@ -409,6 +504,172 @@ app.post('/api/bot/stop', authenticateToken, (req, res) => {
   res.json({ message: 'Trading bot stopped', status: botStatus });
 });
 
+// Binary/Deriv Bot Strategies
+const botStrategies = {
+  'trend_following': {
+    name: 'Trend Following',
+    description: 'Follows market trends using moving averages',
+    parameters: { fast_ma: 5, slow_ma: 20, risk_percentage: 2 }
+  },
+  'mean_reversion': {
+    name: 'Mean Reversion',
+    description: 'Trades against extreme price movements',
+    parameters: { lookback_period: 20, deviation_threshold: 2, risk_percentage: 1.5 }
+  },
+  'breakout': {
+    name: 'Breakout Trading',
+    description: 'Trades breakouts from consolidation patterns',
+    parameters: { consolidation_period: 20, breakout_threshold: 0.5, risk_percentage: 3 }
+  },
+  'scalping': {
+    name: 'Scalping',
+    description: 'Quick trades for small profits',
+    parameters: { tick_interval: 5, profit_target: 0.5, stop_loss: 0.3 }
+  }
+};
+
+app.get('/api/bot/strategies', authenticateToken, (req, res) => {
+  res.json(botStrategies);
+});
+
+app.post('/api/bot/configure', authenticateToken, (req, res) => {
+  const { strategy, parameters, symbol, stake_amount } = req.body;
+  
+  if (!botStrategies[strategy]) {
+    return res.status(400).json({ error: 'Invalid strategy' });
+  }
+
+  botStatus = {
+    active: false,
+    strategy,
+    parameters: { ...botStrategies[strategy].parameters, ...parameters },
+    symbol: symbol || 'R_10',
+    stake_amount: stake_amount || 1,
+    configured_at: new Date().toISOString()
+  };
+
+  res.json({ message: 'Bot configured successfully', config: botStatus });
+});
+
+// Market Analysis endpoints
+app.get('/api/analysis/technical', authenticateToken, async (req, res) => {
+  const { symbol, timeframe } = req.query;
+  
+  try {
+    // Get historical data from Deriv API
+    const response = await axios.post(`${DERIV_API_URL}/ticks_history`, {
+      ticks_history: symbol || 'R_10',
+      count: 100,
+      end: 'latest',
+      style: 'candles',
+      granularity: timeframe || 60,
+      app_id: DERIV_APP_ID
+    });
+
+    const candles = response.data.candles || [];
+    
+    // Calculate technical indicators
+    const analysis = {
+      symbol: symbol || 'R_10',
+      timeframe: timeframe || 60,
+      indicators: {
+        sma_20: calculateSMA(candles, 20),
+        rsi: calculateRSI(candles, 14),
+        macd: calculateMACD(candles),
+        bollinger_bands: calculateBollingerBands(candles, 20)
+      },
+      signals: generateSignals(candles)
+    };
+
+    res.json(analysis);
+  } catch (error) {
+    res.status(500).json({ error: 'Analysis error', details: error.message });
+  }
+});
+
+// Helper functions for technical analysis
+function calculateSMA(candles, period) {
+  if (candles.length < period) return null;
+  const closes = candles.slice(-period).map(c => c.close);
+  return closes.reduce((sum, price) => sum + price, 0) / period;
+}
+
+function calculateRSI(candles, period) {
+  if (candles.length < period + 1) return null;
+  
+  let gains = 0;
+  let losses = 0;
+  
+  for (let i = 1; i <= period; i++) {
+    const change = candles[candles.length - i].close - candles[candles.length - i - 1].close;
+    if (change > 0) gains += change;
+    else losses += Math.abs(change);
+  }
+  
+  const avgGain = gains / period;
+  const avgLoss = losses / period;
+  const rs = avgGain / avgLoss;
+  
+  return 100 - (100 / (1 + rs));
+}
+
+function calculateMACD(candles) {
+  if (candles.length < 26) return null;
+  
+  const ema12 = calculateEMA(candles, 12);
+  const ema26 = calculateEMA(candles, 26);
+  const macd = ema12 - ema26;
+  const signal = calculateEMA([...candles.slice(-9).map(() => macd)], 9);
+  
+  return { macd, signal, histogram: macd - signal };
+}
+
+function calculateEMA(candles, period) {
+  const closes = candles.map(c => c.close);
+  const multiplier = 2 / (period + 1);
+  let ema = closes[0];
+  
+  for (let i = 1; i < closes.length; i++) {
+    ema = (closes[i] * multiplier) + (ema * (1 - multiplier));
+  }
+  
+  return ema;
+}
+
+function calculateBollingerBands(candles, period) {
+  if (candles.length < period) return null;
+  
+  const closes = candles.slice(-period).map(c => c.close);
+  const sma = closes.reduce((sum, price) => sum + price, 0) / period;
+  const variance = closes.reduce((sum, price) => sum + Math.pow(price - sma, 2), 0) / period;
+  const stdDev = Math.sqrt(variance);
+  
+  return {
+    upper: sma + (2 * stdDev),
+    middle: sma,
+    lower: sma - (2 * stdDev)
+  };
+}
+
+function generateSignals(candles) {
+  const signals = [];
+  
+  if (candles.length < 20) return signals;
+  
+  const latest = candles[candles.length - 1];
+  const previous = candles[candles.length - 2];
+  const sma20 = calculateSMA(candles, 20);
+  
+  // Simple trend signals
+  if (latest.close > sma20 && previous.close <= sma20) {
+    signals.push({ type: 'BUY', reason: 'Price crossed above SMA20', strength: 'medium' });
+  } else if (latest.close < sma20 && previous.close >= sma20) {
+    signals.push({ type: 'SELL', reason: 'Price crossed below SMA20', strength: 'medium' });
+  }
+  
+  return signals;
+}
+
 // Copy trading routes
 const topTraders = [
   { id: 'trader1', name: 'CryptoMaster', return_7d: 24.5, risk: 'Medium', copiers: 3200, win_rate: 78 },
@@ -425,6 +686,94 @@ app.get('/api/copy-trading/top-traders', (req, res) => {
 app.post('/api/copy-trading/copy', authenticateToken, (req, res) => {
   const { traderId, amount } = req.body;
   res.json({ message: `Now copying trader ${traderId} with ${amount}`, traderId, amount });
+});
+
+// Trade History and Performance
+app.get('/api/trades/history', authenticateToken, (req, res) => {
+  const userId = req.user.id;
+  const { limit = 50, offset = 0 } = req.query;
+  
+  db.all(`
+    SELECT * FROM trades 
+    WHERE user_id = ? 
+    ORDER BY created_at DESC 
+    LIMIT ? OFFSET ?
+  `, [userId, limit, offset], (err, rows) => {
+    if (err) {
+      return res.status(500).json({ error: 'Database error' });
+    }
+    res.json(rows);
+  });
+});
+
+app.get('/api/trades/performance', authenticateToken, (req, res) => {
+  const userId = req.user.id;
+  
+  db.get(`
+    SELECT 
+      COUNT(*) as total_trades,
+      SUM(CASE WHEN profit_loss > 0 THEN 1 ELSE 0 END) as winning_trades,
+      SUM(CASE WHEN profit_loss < 0 THEN 1 ELSE 0 END) as losing_trades,
+      SUM(profit_loss) as total_profit,
+      AVG(profit_loss) as avg_profit,
+      MAX(profit_loss) as best_trade,
+      MIN(profit_loss) as worst_trade
+    FROM trades 
+    WHERE user_id = ?
+  `, [userId], (err, row) => {
+    if (err) {
+      return res.status(500).json({ error: 'Database error' });
+    }
+    
+    const performance = {
+      total_trades: row.total_trades || 0,
+      winning_trades: row.winning_trades || 0,
+      losing_trades: row.losing_trades || 0,
+      win_rate: row.total_trades > 0 ? (row.winning_trades / row.total_trades * 100).toFixed(2) : 0,
+      total_profit: row.total_profit || 0,
+      avg_profit: row.avg_profit || 0,
+      best_trade: row.best_trade || 0,
+      worst_trade: row.worst_trade || 0
+    };
+    
+    res.json(performance);
+  });
+});
+
+// Risk Management
+app.get('/api/risk/limits', authenticateToken, (req, res) => {
+  const userId = req.user.id;
+  
+  db.get('SELECT * FROM users WHERE id = ?', [userId], (err, user) => {
+    if (err) {
+      return res.status(500).json({ error: 'Database error' });
+    }
+    
+    const limits = {
+      daily_loss_limit: user.daily_loss_limit || 100,
+      max_stake: user.max_stake || 50,
+      max_trades_per_day: user.max_trades_per_day || 100,
+      risk_percentage: user.risk_percentage || 2
+    };
+    
+    res.json(limits);
+  });
+});
+
+app.post('/api/risk/limits', authenticateToken, (req, res) => {
+  const userId = req.user.id;
+  const { daily_loss_limit, max_stake, max_trades_per_day, risk_percentage } = req.body;
+  
+  db.run(`
+    UPDATE users 
+    SET daily_loss_limit = ?, max_stake = ?, max_trades_per_day = ?, risk_percentage = ?
+    WHERE id = ?
+  `, [daily_loss_limit, max_stake, max_trades_per_day, risk_percentage, userId], function(err) {
+    if (err) {
+      return res.status(500).json({ error: 'Database error' });
+    }
+    res.json({ message: 'Risk limits updated successfully' });
+  });
 });
 
 // Server setup
