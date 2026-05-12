@@ -37,6 +37,23 @@ app.use(cors({
 }));
 app.use(express.json());
 
+// Root route
+app.get('/', (req, res) => {
+  res.json({
+    message: 'Lian Traders API Server',
+    status: 'running',
+    version: '1.0.0',
+    endpoints: {
+      auth: '/api/auth/login, /api/auth/register',
+      user: '/api/user/profile',
+      market: '/api/market/prices',
+      trades: '/api/trades/open, /api/trades/close',
+      bot: '/api/bot/status, /api/bot/start, /api/bot/stop',
+      copy_trading: '/api/copy-trading/top-traders'
+    }
+  });
+});
+
 // Database setup
 const db = new sqlite3.Database('./trading.db', (err) => {
   if (err) {
