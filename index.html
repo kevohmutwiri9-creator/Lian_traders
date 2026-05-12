@@ -1140,7 +1140,7 @@
                                 <li>Community access</li>
                                 <li>Email support</li>
                             </ul>
-                            <button class="btn btn-outline">Get Started</button>
+                            <button class="btn btn-outline pricing-btn" data-plan="Starter">Get Started</button>
                         </div>
                         <div class="pricing-card featured">
                             <div class="popular-badge">Most Popular</div>
@@ -1153,7 +1153,7 @@
                                 <li>Priority support</li>
                                 <li>Trading tools access</li>
                             </ul>
-                            <button class="btn btn-primary">Get Started</button>
+                            <button class="btn btn-primary pricing-btn" data-plan="Professional">Get Started</button>
                         </div>
                         <div class="pricing-card">
                             <h3>Elite</h3>
@@ -1165,7 +1165,7 @@
                                 <li>API access</li>
                                 <li>White-label solutions</li>
                             </ul>
-                            <button class="btn btn-outline">Get Started</button>
+                            <button class="btn btn-outline pricing-btn" data-plan="Elite">Get Started</button>
                         </div>
                     </div>
                 </div>
@@ -2072,6 +2072,26 @@ document.addEventListener('DOMContentLoaded', function() {
             alert(`Now copying ${traderName}!`);
         });
     });
+    
+    // Pricing button handlers
+    document.querySelectorAll('.pricing-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const plan = this.getAttribute('data-plan');
+            if (!authToken) {
+                showLoginModal();
+                return;
+            }
+            alert(`You selected the ${plan} plan! Redirecting to payment...`);
+        });
+    });
+    
+    // CTA button handler
+    const ctaBtn = document.querySelector('.cta .btn-primary');
+    if (ctaBtn) {
+        ctaBtn.addEventListener('click', function() {
+            showSignupModal();
+        });
+    }
 });
 
 // Auth Functions
