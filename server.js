@@ -12,6 +12,15 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 const JWT_SECRET = process.env.JWT_SECRET || 'lian-traders-secret-key';
 
+// Global bot status
+let botStatus = {
+  active: false,
+  strategy: 'none',
+  symbol: 'R_10',
+  trades_today: 0,
+  profit_today: 0
+};
+
 // Binary/Deriv API Configuration
 const DERIV_APP_ID = 70590;
 const DERIV_API_URL = 'https://api.derivws.com';
@@ -491,7 +500,7 @@ app.post('/api/bot/start', authenticateToken, (req, res) => {
   botStatus = {
     active: true,
     strategy: strategy || 'trend_following',
-    symbol: symbol || 'EUR/USD',
+    symbol: symbol || 'R_10',
     trades_today: 0,
     profit_today: 0,
     started_at: new Date().toISOString()
