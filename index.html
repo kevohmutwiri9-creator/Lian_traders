@@ -25,50 +25,13 @@
                 font-size: 62.5%;
             }
         </style>
-        <style>
-            /* Custom overrides to differentiate from original */
-            .cl__logo-db {
-                color: #4a90e2; /* Change to blue */
-                filter: drop-shadow(0 0 20px #4a90e299);
-            }
-            .cl__logo-traders {
-                color: #50c878; /* Change to green */
-                filter: drop-shadow(0 0 20px #50c8788c);
-            }
-            .cl__card {
-                background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-                border: 1px solid #4a90e233;
-            }
-            .cl__ticker-item {
-                background: rgba(74, 144, 226, 0.1);
-                border-right: 1px solid rgba(74, 144, 226, 0.2);
-            }
-            .cl__ticker-change--up {
-                color: #50c878;
-            }
-            .cl__ticker-change--down {
-                color: #ff6b6b;
-            }
-            .cl__progress-row .cl__bar-fill {
-                background: linear-gradient(90deg, #4a90e2, #50c878);
-            }
-            .cl__feature-icon-wrap:hover {
-                background: rgba(74, 144, 226, 0.2);
-            }
-        </style>
-    <link href="static/css/767.cfbf5094.css" rel="stylesheet"><link href="static/css/index.2702ab47.css" rel="stylesheet"><link rel="stylesheet" type="text/css" href="static/css/252.a1f0e185.css"><link rel="stylesheet" type="text/css" href="static/css/635.b6ca8bb3.css"><link rel="stylesheet" type="text/css" href="static/css/426.7e0be044.css"></head><body class="body theme theme--light"><script defer="" src="static/js/lib-react.7e3f0832.js"></script><script defer="" src="static/js/lib-router.13959373.js"></script><script defer="" src="static/js/767.b1d42a92.js"></script><script defer="" src="static/js/index.6ccd64c9.js"></script><style id="monica-reading-highlight-style">
-        .monica-reading-highlight {
-          animation: fadeInOut 1.5s ease-in-out;
-        }
-
-        @keyframes fadeInOut {
-          0%, 100% { background-color: transparent; }
-          30%, 70% { background-color: rgba(2, 118, 255, 0.20); }
-        }
-      </style>
-      
-      <!-- Lian Traders Landing Page Styles -->
-      <style>
+    </head>
+    <body>
+    <div id="modal_root" class="modal-root"></div>
+    <div id="popup_root" class="popup-root"></div>
+    
+    <!-- Lian Traders Landing Page Styles -->
+    <style>
         * {
             margin: 0;
             padding: 0;
@@ -420,6 +383,12 @@
         .author-title {
             color: #666;
             font-size: 0.9rem;
+        }
+        
+        /* Modal and Popup Roots */
+        .modal-root, .popup-root {
+            position: fixed;
+            z-index: 3000;
         }
         
         /* Modal Styles */
@@ -1820,87 +1789,6 @@ const botSettings = {
                 </div>
             </div>
             
-<!-- SPA Routing and Navigation Script -->
-        <script>
-            // SPA Routing System
-            function handleRoute() {
-                const hash = window.location.hash || '#home';
-                const pages = document.querySelectorAll('.page');
-                const navLinks = document.querySelectorAll('.nav-link');
-                
-                // Hide all pages
-                pages.forEach(page => {
-                    page.classList.remove('active');
-                });
-                
-                // Remove active class from all nav links
-                navLinks.forEach(link => {
-                    link.classList.remove('active');
-                });
-                
-                // Show current page
-                const currentPage = document.querySelector(hash);
-                if (currentPage) {
-                    currentPage.classList.add('active');
-                }
-                
-                // Set active nav link
-                const activeLink = document.querySelector(`.nav-link[href="${hash}"]`);
-                if (activeLink) {
-                    activeLink.classList.add('active');
-                }
-                
-                // Handle pricing section on home page
-                if (hash === '#pricing') {
-                    const homePage = document.querySelector('#home');
-                    if (homePage) {
-                        homePage.classList.add('active');
-                        // Scroll to pricing section
-                        setTimeout(() => {
-                            const pricingSection = document.querySelector('.pricing');
-                            if (pricingSection) {
-                                pricingSection.scrollIntoView({ behavior: 'smooth' });
-                            }
-                        }, 100);
-                    }
-                }
-                
-                // Scroll to top when changing pages
-                if (hash !== '#pricing') {
-                    window.scrollTo(0, 0);
-                }
-            }
-            
-            // Mobile Navigation Toggle
-            function initMobileNav() {
-                const navToggle = document.getElementById('navToggle');
-                const navMenu = document.getElementById('navMenu');
-                
-                if (navToggle && navMenu) {
-                    navToggle.addEventListener('click', () => {
-                        navMenu.classList.toggle('active');
-                        navToggle.classList.toggle('active');
-                    });
-                }
-                
-                // Close mobile menu when clicking a link
-                const navLinks = document.querySelectorAll('.nav-link, .nav-btn');
-                navLinks.forEach(link => {
-                    link.addEventListener('click', () => {
-                        if (navMenu) navMenu.classList.remove('active');
-                        if (navToggle) navToggle.classList.remove('active');
-                    });
-                });
-            }
-            
-            // Initialize routing and mobile nav
-            window.addEventListener('hashchange', handleRoute);
-            window.addEventListener('load', () => {
-                handleRoute();
-                initMobileNav();
-            });
-        </script>
-        
         <!-- LiveChat script -->
         <script type="text/javascript" defer="">
             window.__lc = window.__lc || {};
