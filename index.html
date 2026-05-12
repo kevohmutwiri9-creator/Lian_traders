@@ -1256,7 +1256,7 @@
                                     <div>
                                         <h3>Trading Performance Chart</h3>
                                         <p>Real-time trading analytics will appear here</p>
-                                        <button class="btn btn-primary" style="margin-top: 20px;">Connect Trading Account</button>
+                                        <button class="btn btn-primary dashboard-action-btn" data-action="connect-account" style="margin-top: 20px;">Connect Trading Account</button>
                                     </div>
                                 </div>
                                 <div class="positions-panel" style="background: #1a1a2e; border-radius: 12px; padding: 20px; margin-top: 20px;">
@@ -1277,8 +1277,8 @@
                                             <p style="color: #a0a0a0; margin-top: 5px;">Active • Running for 2h 34m</p>
                                         </div>
                                         <div>
-                                            <button class="btn btn-secondary" style="padding: 8px 16px; font-size: 12px;">Stop</button>
-                                            <button class="btn btn-primary" style="padding: 8px 16px; font-size: 12px; margin-left: 10px;">Edit</button>
+                                            <button class="btn btn-secondary bot-action-btn" data-action="stop" data-bot="scalping-v1" style="padding: 8px 16px; font-size: 12px;">Stop</button>
+                                            <button class="btn btn-primary bot-action-btn" data-action="edit" data-bot="scalping-v1" style="padding: 8px 16px; font-size: 12px; margin-left: 10px;">Edit</button>
                                         </div>
                                     </div>
                                     <div style="background: #1a1a2e; padding: 20px; border-radius: 12px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
@@ -1287,8 +1287,8 @@
                                             <p style="color: #a0a0a0; margin-top: 5px;">Stopped • Last run: 1h ago</p>
                                         </div>
                                         <div>
-                                            <button class="btn btn-primary" style="padding: 8px 16px; font-size: 12px;">Start</button>
-                                            <button class="btn btn-primary" style="padding: 8px 16px; font-size: 12px; margin-left: 10px;">Edit</button>
+                                            <button class="btn btn-primary bot-action-btn" data-action="start" data-bot="trend-v2" style="padding: 8px 16px; font-size: 12px;">Start</button>
+                                            <button class="btn btn-primary bot-action-btn" data-action="edit" data-bot="trend-v2" style="padding: 8px 16px; font-size: 12px; margin-left: 10px;">Edit</button>
                                         </div>
                                     </div>
                                     <div style="background: #1a1a2e; padding: 20px; border-radius: 12px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
@@ -1297,11 +1297,11 @@
                                             <p style="color: #a0a0a0; margin-top: 5px;">Active • Running for 45m</p>
                                         </div>
                                         <div>
-                                            <button class="btn btn-secondary" style="padding: 8px 16px; font-size: 12px;">Stop</button>
-                                            <button class="btn btn-primary" style="padding: 8px 16px; font-size: 12px; margin-left: 10px;">Edit</button>
+                                            <button class="btn btn-secondary bot-action-btn" data-action="stop" data-bot="mean-reversion" style="padding: 8px 16px; font-size: 12px;">Stop</button>
+                                            <button class="btn btn-primary bot-action-btn" data-action="edit" data-bot="mean-reversion" style="padding: 8px 16px; font-size: 12px; margin-left: 10px;">Edit</button>
                                         </div>
                                     </div>
-                                    <button class="btn btn-primary" style="width: 100%; margin-top: 20px;">+ Create New Bot</button>
+                                    <button class="btn btn-primary create-bot-btn" style="width: 100%; margin-top: 20px;">+ Create New Bot</button>
                                 </div>
                             </div>
                             
@@ -1410,7 +1410,7 @@
                                             <label style="display: block; color: #a0a0a0; margin-bottom: 5px;">Email</label>
                                             <input type="email" value="john@example.com" style="width: 100%; padding: 10px; background: #0f0f1a; border: 1px solid #333; border-radius: 8px; color: white; box-sizing: border-box;">
                                         </div>
-                                        <button class="btn btn-primary">Save Changes</button>
+                                        <button class="btn btn-primary settings-action-btn" data-action="save-profile">Save Changes</button>
                                     </div>
                                     <div style="background: #1a1a2e; padding: 20px; border-radius: 12px; margin-bottom: 20px;">
                                         <h4 style="margin-bottom: 15px;">Trading Preferences</h4>
@@ -1430,11 +1430,11 @@
                                             <label style="display: block; color: #a0a0a0; margin-bottom: 5px;">Default Trade Amount</label>
                                             <input type="number" value="100" style="width: 100%; padding: 10px; background: #0f0f1a; border: 1px solid #333; border-radius: 8px; color: white; box-sizing: border-box;">
                                         </div>
-                                        <button class="btn btn-primary">Save Preferences</button>
+                                        <button class="btn btn-primary settings-action-btn" data-action="save-preferences">Save Preferences</button>
                                     </div>
                                     <div style="background: #1a1a2e; padding: 20px; border-radius: 12px;">
                                         <h4 style="margin-bottom: 15px; color: #ff6b6b;">Danger Zone</h4>
-                                        <button class="btn btn-secondary" style="border-color: #ff6b6b; color: #ff6b6b;">Delete Account</button>
+                                        <button class="btn btn-secondary settings-action-btn" data-action="delete-account" style="border-color: #ff6b6b; color: #ff6b6b;">Delete Account</button>
                                     </div>
                                 </div>
                             </div>
@@ -1459,8 +1459,8 @@
                                 <li data-section="restart-trading">Restart Trading</li>
                                 <li data-section="settings">Settings</li>
                             </ul>
-                            <button class="btn btn-primary" style="margin-top: 20px; width: 100%;">Save Bot</button>
-                            <button class="btn btn-secondary" style="margin-top: 10px; width: 100%;">Test Bot</button>
+                            <button class="btn btn-primary bot-editor-action-btn" data-action="save-bot" style="margin-top: 20px; width: 100%;">Save Bot</button>
+                            <button class="btn btn-secondary bot-editor-action-btn" data-action="test-bot" style="margin-top: 10px; width: 100%;">Test Bot</button>
                         </div>
                         <div class="editor-main">
                             <!-- Purchase Conditions Section -->
@@ -1519,7 +1519,7 @@ const sellSettings = {
                                         <label style="display: block; color: #a0a0a0; margin-bottom: 5px;">Max consecutive losses</label>
                                         <input type="number" value="5" style="width: 100%; padding: 10px; background: #0f0f1a; border: 1px solid #333; border-radius: 8px; color: white; box-sizing: border-box;">
                                     </div>
-                                    <button class="btn btn-primary">Save Restart Settings</button>
+                                    <button class="btn btn-primary bot-editor-action-btn" data-action="save-restart">Save Restart Settings</button>
                                 </div>
                             </div>
                             
@@ -1553,7 +1553,7 @@ const sellSettings = {
                                             <option>1 hour</option>
                                         </select>
                                     </div>
-                                    <button class="btn btn-primary">Save Settings</button>
+                                    <button class="btn btn-primary bot-editor-action-btn" data-action="save-settings">Save Settings</button>
                                 </div>
                             </div>
                         </div>
@@ -1590,17 +1590,17 @@ const sellSettings = {
                                 <div class="stat-card" style="text-align: left;">
                                     <h3>Trend Follower</h3>
                                     <p style="color: #a0a0a0; margin: 10px 0;">Follows market trends automatically</p>
-                                    <button class="btn btn-primary" style="padding: 8px 16px;">Activate</button>
+                                    <button class="btn btn-primary speedbot-action-btn" data-action="activate" data-bot="trend-follower" style="padding: 8px 16px;">Activate</button>
                                 </div>
                                 <div class="stat-card" style="text-align: left;">
                                     <h3>Scalper Pro</h3>
                                     <p style="color: #a0a0a0; margin: 10px 0;">Quick trades for small profits</p>
-                                    <button class="btn btn-primary" style="padding: 8px 16px;">Activate</button>
+                                    <button class="btn btn-primary speedbot-action-btn" data-action="activate" data-bot="scalper-pro" style="padding: 8px 16px;">Activate</button>
                                 </div>
                                 <div class="stat-card" style="text-align: left;">
                                     <h3>Swing Trader</h3>
                                     <p style="color: #a0a0a0; margin: 10px 0;">Medium-term strategy bot</p>
-                                    <button class="btn btn-primary" style="padding: 8px 16px;">Activate</button>
+                                    <button class="btn btn-primary speedbot-action-btn" data-action="activate" data-bot="swing-trader" style="padding: 8px 16px;">Activate</button>
                                 </div>
                             </div>
                         </div>
@@ -1624,7 +1624,7 @@ const sellSettings = {
                                 <li>Reading charts</li>
                                 <li>Risk management</li>
                             </ul>
-                            <button class="btn btn-primary">Start Learning</button>
+                            <button class="btn btn-primary education-action-btn" data-action="start-course" data-course="beginners">Start Learning</button>
                         </div>
                         <div class="course-card">
                             <h3>📊 Technical Analysis</h3>
@@ -1634,7 +1634,7 @@ const sellSettings = {
                                 <li>Technical indicators</li>
                                 <li>Support & resistance</li>
                             </ul>
-                            <button class="btn btn-primary">Start Learning</button>
+                            <button class="btn btn-primary education-action-btn" data-action="start-course" data-course="technical-analysis">Start Learning</button>
                         </div>
                         <div class="course-card">
                             <h3>🤖 Bot Trading</h3>
@@ -1644,7 +1644,7 @@ const sellSettings = {
                                 <li>Strategy building</li>
                                 <li>Backtesting</li>
                             </ul>
-                            <button class="btn btn-primary">Start Learning</button>
+                            <button class="btn btn-primary education-action-btn" data-action="start-course" data-course="bot-trading">Start Learning</button>
                         </div>
                         <div class="course-card">
                             <h3>💰 Risk Management</h3>
@@ -1654,7 +1654,7 @@ const sellSettings = {
                                 <li>Stop-loss strategies</li>
                                 <li>Portfolio management</li>
                             </ul>
-                            <button class="btn btn-primary">Start Learning</button>
+                            <button class="btn btn-primary education-action-btn" data-action="start-course" data-course="risk-management">Start Learning</button>
                         </div>
                     </div>
                 </div>
@@ -2284,6 +2284,118 @@ document.addEventListener('DOMContentLoaded', function() {
             if (targetSection) {
                 targetSection.classList.add('active');
             }
+        });
+    });
+    
+    // Dashboard action buttons
+    document.querySelectorAll('.dashboard-action-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const action = this.getAttribute('data-action');
+            if (action === 'connect-account') {
+                if (!authToken) {
+                    showLoginModal();
+                    return;
+                }
+                alert('Connecting to trading account...');
+            }
+        });
+    });
+    
+    // Bot action buttons
+    document.querySelectorAll('.bot-action-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const action = this.getAttribute('data-action');
+            const bot = this.getAttribute('data-bot');
+            if (!authToken) {
+                showLoginModal();
+                return;
+            }
+            if (action === 'start') {
+                alert(`Starting ${bot}...`);
+            } else if (action === 'stop') {
+                alert(`Stopping ${bot}...`);
+            } else if (action === 'edit') {
+                navigateTo('bot-editor');
+            }
+        });
+    });
+    
+    // Create bot button
+    document.querySelectorAll('.create-bot-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            if (!authToken) {
+                showLoginModal();
+                return;
+            }
+            navigateTo('bot-editor');
+        });
+    });
+    
+    // Settings action buttons
+    document.querySelectorAll('.settings-action-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const action = this.getAttribute('data-action');
+            if (!authToken) {
+                showLoginModal();
+                return;
+            }
+            if (action === 'save-profile') {
+                alert('Profile saved successfully!');
+            } else if (action === 'save-preferences') {
+                alert('Preferences saved successfully!');
+            } else if (action === 'delete-account') {
+                if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+                    alert('Account deletion requested. You will receive a confirmation email.');
+                }
+            }
+        });
+    });
+    
+    // Bot Editor action buttons
+    document.querySelectorAll('.bot-editor-action-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const action = this.getAttribute('data-action');
+            if (!authToken) {
+                showLoginModal();
+                return;
+            }
+            if (action === 'save-bot') {
+                alert('Bot saved successfully!');
+            } else if (action === 'test-bot') {
+                alert('Running bot test...');
+            } else if (action === 'save-restart') {
+                alert('Restart settings saved!');
+            } else if (action === 'save-settings') {
+                alert('Bot settings saved!');
+            }
+        });
+    });
+    
+    // Speedbot action buttons
+    document.querySelectorAll('.speedbot-action-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const action = this.getAttribute('data-action');
+            const bot = this.getAttribute('data-bot');
+            if (!authToken) {
+                showLoginModal();
+                return;
+            }
+            if (action === 'activate') {
+                alert(`Activating ${bot} strategy...`);
+            }
+        });
+    });
+    
+    // Education action buttons
+    document.querySelectorAll('.education-action-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const action = this.getAttribute('data-action');
+            const course = this.getAttribute('data-course');
+            if (!authToken) {
+                showLoginModal();
+                return;
+            }
+            alert(`Starting ${course} course...`);
         });
     });
 });
