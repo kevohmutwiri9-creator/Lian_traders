@@ -20,6 +20,25 @@
                 favicon.type = `image/${extension === 'svg' ? 'svg+xml' : extension}`;
                 favicon.href = faviconPath;
             })();
+
+            // Configure API base URL for Lian Traders backend
+            (function () {
+                const currentDomain = window.location.hostname;
+                let apiBaseUrl = 'https://lian-traders-api.onrender.com';
+
+                // Set API base URL based on environment
+                if (currentDomain === 'localhost' || currentDomain === '127.0.0.1') {
+                    apiBaseUrl = 'http://localhost:3001';
+                }
+
+                // Make API base URL available globally
+                window.LIAN_TRADERS_API_BASE_URL = apiBaseUrl;
+                window.REACT_APP_API_BASE_URL = apiBaseUrl;
+                window.REACT_APP_BACKEND_URL = apiBaseUrl;
+
+                console.log('Lian Traders API Base URL:', apiBaseUrl);
+            })();
+        </script>
         </script>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="title" content="Lian Traders." />

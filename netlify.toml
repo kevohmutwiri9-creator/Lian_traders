@@ -19,6 +19,10 @@
 [build.processing.images]
   compress = false
 
+[build.environment]
+  REACT_APP_API_BASE_URL = "https://lian-traders-api.onrender.com"
+  REACT_APP_BACKEND_URL = "https://lian-traders-api.onrender.com"
+
 [[headers]]
   for = "/*"
   [headers.values]
