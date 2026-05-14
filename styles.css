@@ -341,3 +341,83 @@ a {
     gap: 0.85rem;
   }
 }
+
+/* ========== PAGE LAYOUT FIXES ========== */
+
+/* Ensure content is not hidden behind navigation */
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+.site-header {
+  z-index: 100;
+}
+
+/* Main content wrapper */
+main, .main-content, [role="main"] {
+  z-index: 1;
+  position: relative;
+  flex: 1;
+}
+
+/* Tab content visibility */
+.tab-content, .page-content, [role="tabpanel"] {
+  z-index: 1;
+  position: relative;
+  min-height: calc(100vh - 200px);
+  padding-top: 20px;
+  padding-bottom: 40px;
+  visibility: visible;
+  display: block !important;
+}
+
+/* Ensure modals stay on top */
+.modal-root, .popup-root, [role="dialog"] {
+  z-index: 9999;
+}
+
+/* Fix scrollable sections */
+.scrollable-section, .overflow-auto {
+  overflow-y: auto;
+  max-height: calc(100vh - 100px);
+  z-index: 1;
+}
+
+/* Ensure sections after tabs are visible */
+section {
+  position: relative;
+  z-index: 1;
+}
+
+/* Fix hidden content after navigation tabs */
+[hidden] {
+  display: none !important;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* Visibility helpers */
+.visible {
+  display: block !important;
+}
+
+/* Content wrapper padding to prevent header overlap */
+.container {
+  position: relative;
+  z-index: 1;
+}
+
+/* Tab navigation */
+.nav-tabs, [role="tablist"] {
+  z-index: 50;
+  position: relative;
+}
+
+/* Ensure all page sections have proper stacking */
+.page {
+  position: relative;
+  z-index: 1;
+}

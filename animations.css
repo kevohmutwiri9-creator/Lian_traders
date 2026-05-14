@@ -334,3 +334,171 @@
 .no-transition {
   transition: none !important;
 }
+
+/* ========== NOTIFICATION SYSTEM ========== */
+
+.notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 10000;
+  min-width: 320px;
+  max-width: 500px;
+  padding: 16px 20px;
+  border-radius: 8px;
+  backdrop-filter: blur(10px);
+  animation: slideInFromTop 0.4s ease-out;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.notification-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.notification-icon {
+  font-size: 18px;
+  font-weight: bold;
+  min-width: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notification-message-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.notification-message {
+  word-wrap: break-word;
+  max-width: 100%;
+}
+
+.notification-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.notification-close {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  font-size: 24px;
+  padding: 0;
+  margin: -4px -4px -4px 8px;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+  line-height: 1;
+}
+
+.notification-close:hover {
+  opacity: 1;
+}
+
+/* Notification type styling */
+.notification-success {
+  background-color: rgba(40, 200, 120, 0.15);
+  border-left: 4px solid #28c878;
+  color: #28c878;
+}
+
+.notification-error {
+  background-color: rgba(220, 53, 69, 0.15);
+  border-left: 4px solid #dc3545;
+  color: #ff6b6b;
+}
+
+.notification-warning {
+  background-color: rgba(255, 193, 7, 0.15);
+  border-left: 4px solid #ffc107;
+  color: #ffc107;
+}
+
+.notification-loading {
+  background-color: rgba(74, 144, 226, 0.15);
+  border-left: 4px solid #4a90e2;
+  color: #4a90e2;
+}
+
+.notification-info {
+  background-color: rgba(108, 130, 255, 0.15);
+  border-left: 4px solid #6c82ff;
+  color: #6c82ff;
+}
+
+/* Icon styling */
+.icon-success {
+  color: #28c878;
+}
+
+.icon-error {
+  color: #ff6b6b;
+}
+
+.icon-warning {
+  color: #ffc107;
+}
+
+.icon-loading {
+  color: #4a90e2;
+}
+
+.icon-info {
+  color: #6c82ff;
+}
+
+/* Multiple notifications stacking */
+.notification:nth-last-of-type(2) {
+  top: 80px;
+}
+
+.notification:nth-last-of-type(3) {
+  top: 140px;
+}
+
+.notification:nth-last-of-type(4) {
+  top: 200px;
+}
+
+/* ========== PAGE LAYOUT FIXES ========== */
+
+/* Ensure content is not hidden behind sticky headers */
+main, .main-content, [role="main"] {
+  z-index: 1;
+  position: relative;
+}
+
+/* Fix for education tab and other tabs */
+.tab-content, .page-content, [role="tabpanel"] {
+  z-index: 1;
+  position: relative;
+  min-height: 100vh;
+  padding-top: 20px;
+}
+
+/* Ensure modals are always on top */
+.modal-root, .popup-root, [role="dialog"] {
+  z-index: 9999;
+}
+
+/* Fix scrollable sections */
+.scrollable-section, .overflow-auto {
+  overflow-y: auto;
+  max-height: calc(100vh - 100px);
+}

@@ -137,6 +137,8 @@ class TradingDashboard {
 
   // Execute a buy trade
   async executeBuyTrade(symbol, amount, duration) {
+    const loader = this.showLoadingNotification(`Executing BUY trade for $${amount}...`);
+    
     try {
       const response = await fetch(`${this.apiBase}/api/trading/buy`, {
         method: 'POST',
@@ -149,21 +151,29 @@ class TradingDashboard {
       
       if (response.ok) {
         const trade = await response.json();
-        this.showNotification('Trade executed successfully!', 'success');
-        await this.loadUserData();
-        await this.loadTradeHistory();
+        loader.success(`✓ BUY trade executed! Contract ID: ${trade.contract_id || 'Pending'}`);
+        
+        // Update UI after short delay
+        setTimeout(async () => {
+          await this.loadUserData();
+          await this.loadTradeHistory();
+        }, 500);
+        
         return trade;
       } else {
-        this.showNotification('Trade execution failed', 'error');
+        const errorData = await response.json();
+        loader.error(`✕ Trade failed: ${errorData.error || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('Trade execution error:', error);
-      this.showNotification('Error executing trade', 'error');
+      loader.error(`✕ Connection error: ${error.message}`);
     }
   }
 
   // Execute a sell trade
   async executeSellTrade(contractId) {
+    const loader = this.showLoadingNotification('Closing position...');
+    
     try {
       const response = await fetch(`${this.apiBase}/api/trading/sell`, {
         method: 'POST',
@@ -175,13 +185,20 @@ class TradingDashboard {
       });
       
       if (response.ok) {
-        this.showNotification('Position closed successfully!', 'success');
-        await this.loadUserData();
-        await this.loadTradeHistory();
+        const result = await response.json();
+        loader.success(`✓ Position closed! Profit/Loss: ${result.profit_loss || 'Calculating...'}`);
+        
+        setTimeout(async () => {
+          await this.loadUserData();
+          await this.loadTradeHistory();
+        }, 500);
+      } else {
+        const errorData = await response.json();
+        loader.error(`✕ Failed to close position: ${errorData.error || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('Sell error:', error);
-      this.showNotification('Error closing position', 'error');
+      loader.error(`✕ Connection error: ${error.message}`);
     }
   }
 
@@ -225,6 +242,8 @@ class TradingDashboard {
   }
 
   async startTradingBot() {
+    const loader = this.showLoadingNotification('Starting trading bot with Trend Following strategy...');
+    
     try {
       const response = await fetch(`${this.apiBase}/api/bot/start`, {
         method: 'POST',
@@ -236,14 +255,21 @@ class TradingDashboard {
       });
       
       if (response.ok) {
-        this.showNotification('Trading bot started', 'success');
+        const result = await response.json();
+        loader.success('✓ Trading bot started successfully - monitoring Randindex 10');
+      } else {
+        const errorData = await response.json();
+        loader.error(`✕ Bot failed to start: ${errorData.error || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('Bot start error:', error);
+      loader.error(`✕ Connection error: ${error.message}`);
     }
   }
 
   async stopTradingBot() {
+    const loader = this.showLoadingNotification('Stopping trading bot...');
+    
     try {
       const response = await fetch(`${this.apiBase}/api/bot/stop`, {
         method: 'POST',
@@ -254,10 +280,14 @@ class TradingDashboard {
       });
       
       if (response.ok) {
-        this.showNotification('Trading bot stopped', 'success');
+        loader.success('✓ Trading bot stopped successfully');
+      } else {
+        const errorData = await response.json();
+        loader.error(`✕ Failed to stop bot: ${errorData.error || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('Bot stop error:', error);
+      loader.error(`✕ Connection error: ${error.message}`);
     }
   }
 
@@ -415,17 +445,117 @@ class TradingDashboard {
     }
   }
 
-  showNotification(message, type = 'info') {
+  showNotification(message, type = 'info', duration = 5000) {
     const notificationEl = document.createElement('div');
-    notificationEl.className = `notification ${type} notification`;
-    notificationEl.textContent = message;
+    notificationEl.className = `notification notification-${type}`;
+    
+    // Add icon based on type
+    const icons = {
+      success: '✓',
+      error: '✕',
+      warning: '⚠',
+      info: 'ℹ',
+      loading: '⟳'
+    };
+    
+    // Build notification HTML
+    const icon = icons[type] || icons['info'];
+    notificationEl.innerHTML = `
+      <div class="notification-content">
+        <span class="notification-icon icon-${type}">${icon}</span>
+        <div class="notification-message-wrapper">
+          <span class="notification-message">${message}</span>
+          ${type === 'loading' ? '<span class="notification-spinner"></span>' : ''}
+        </div>
+        <button class="notification-close" aria-label="Close">×</button>
+      </div>
+    `;
+    
+    notificationEl.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 10000;
+      min-width: 300px;
+      max-width: 500px;
+      padding: 16px 20px;
+      border-radius: 8px;
+      backdrop-filter: blur(10px);
+      animation: slideInFromTop 0.4s ease-out;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    `;
+    
+    // Style based on type
+    if (type === 'success') {
+      notificationEl.style.backgroundColor = 'rgba(40, 200, 120, 0.2)';
+      notificationEl.style.borderLeft = '4px solid #28c878';
+      notificationEl.style.color = '#28c878';
+    } else if (type === 'error') {
+      notificationEl.style.backgroundColor = 'rgba(220, 53, 69, 0.2)';
+      notificationEl.style.borderLeft = '4px solid #dc3545';
+      notificationEl.style.color = '#ff6b6b';
+    } else if (type === 'warning') {
+      notificationEl.style.backgroundColor = 'rgba(255, 193, 7, 0.2)';
+      notificationEl.style.borderLeft = '4px solid #ffc107';
+      notificationEl.style.color = '#ffc107';
+    } else if (type === 'loading') {
+      notificationEl.style.backgroundColor = 'rgba(74, 144, 226, 0.2)';
+      notificationEl.style.borderLeft = '4px solid #4a90e2';
+      notificationEl.style.color = '#4a90e2';
+    } else {
+      notificationEl.style.backgroundColor = 'rgba(108, 130, 255, 0.2)';
+      notificationEl.style.borderLeft = '4px solid #6c82ff';
+      notificationEl.style.color = '#6c82ff';
+    }
     
     document.body.appendChild(notificationEl);
     
-    setTimeout(() => {
+    // Close button handler
+    const closeBtn = notificationEl.querySelector('.notification-close');
+    const removeNotification = () => {
       notificationEl.style.opacity = '0';
       setTimeout(() => notificationEl.remove(), 300);
-    }, 5000);
+    };
+    
+    closeBtn.addEventListener('click', removeNotification);
+    
+    // Auto-dismiss based on type
+    if (type === 'success') {
+      setTimeout(removeNotification, duration);
+    } else if (type === 'error' || type === 'warning') {
+      // Errors and warnings don't auto-dismiss, user must close
+      // Or auto-dismiss after longer duration
+      setTimeout(removeNotification, duration * 2);
+    } else if (type === 'loading') {
+      // Loading notifications don't auto-dismiss
+      return notificationEl; // Return element so it can be closed programmatically
+    } else {
+      setTimeout(removeNotification, duration);
+    }
+    
+    return notificationEl;
+  }
+  
+  // Show loading notification and return updater function
+  showLoadingNotification(message) {
+    const notifEl = this.showNotification(message, 'loading', 0);
+    
+    return {
+      success: (successMessage) => {
+        notifEl.style.opacity = '0';
+        setTimeout(() => notifEl.remove(), 300);
+        setTimeout(() => this.showNotification(successMessage || 'Task completed successfully!', 'success'), 400);
+      },
+      error: (errorMessage) => {
+        notifEl.style.opacity = '0';
+        setTimeout(() => notifEl.remove(), 300);
+        setTimeout(() => this.showNotification(errorMessage || 'Task failed', 'error'), 400);
+      },
+      update: (newMessage) => {
+        const msgEl = notifEl.querySelector('.notification-message');
+        if (msgEl) msgEl.textContent = newMessage;
+      }
+    };
   }
 }
 
