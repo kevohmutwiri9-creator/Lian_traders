@@ -37,23 +37,6 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// Root route
-app.get('/', (req, res) => {
-  res.json({
-    message: 'Lian Traders API Server',
-    status: 'running',
-    version: '1.0.0',
-    endpoints: {
-      auth: '/api/auth/login, /api/auth/register',
-      user: '/api/user/profile',
-      market: '/api/market/prices',
-      trades: '/api/trades/open, /api/trades/close',
-      bot: '/api/bot/status, /api/bot/start, /api/bot/stop',
-      copy_trading: '/api/copy-trading/top-traders'
-    }
-  });
-});
-
 // Database setup
 const db = new sqlite3.Database('./trading.db', (err) => {
   if (err) {
@@ -799,6 +782,55 @@ app.post('/api/risk/limits', authenticateToken, (req, res) => {
       return res.status(500).json({ error: 'Database error' });
     }
     res.json({ message: 'Risk limits updated successfully' });
+  });
+});
+
+// Root and Health Check Routes
+app.get('/', (req, res) => {
+  res.json({
+    status: 'online',
+    service: 'Trading Mastery API',
+    version: '1.0.0',
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString(),
+    endpoints: {
+      auth: {
+        register: 'POST /api/auth/register',
+        login: 'POST /api/auth/login',
+        verify: 'GET /api/auth/verify'
+      },
+      trading: {
+        balance: 'GET /api/trading/balance',
+        buy: 'POST /api/trading/buy',
+        sell: 'POST /api/trading/sell',
+        portfolio: 'GET /api/trading/portfolio'
+      },
+      analysis: {
+        technical: 'GET /api/analysis/technical',
+        signals: 'GET /api/analysis/signals'
+      },
+      bot: {
+        strategies: 'GET /api/bot/strategies',
+        status: 'GET /api/bot/status',
+        configure: 'POST /api/bot/configure',
+        start: 'POST /api/bot/start',
+        stop: 'POST /api/bot/stop'
+      },
+      trades: {
+        history: 'GET /api/trades/history',
+        performance: 'GET /api/trades/performance'
+      }
+    }
+  });
+});
+
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'healthy',
+    service: 'Trading Mastery API',
+    timestamp: new Date().toISOString(),
+    database: 'connected',
+    uptime: process.uptime()
   });
 });
 
