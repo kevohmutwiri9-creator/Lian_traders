@@ -1014,11 +1014,25 @@
                     <li><a href="#ldp-tool" class="nav-link">LDP Tool</a></li>
                     <li><a href="#charts" class="nav-link">Charts</a></li>
                     <li><a href="#copy-trading" class="nav-link">Copy Trading</a></li>
+                    <li><a href="#leaderboard" class="nav-link">Leaderboard</a></li>
+                    <li><a href="#admin-dashboard" class="nav-link">Admin</a></li>
                     <li><a href="#education" class="nav-link">Education</a></li>
                     <li><a href="#community" class="nav-link">Community</a></li>
                 </ul>
             </div>
             <div class="nav-auth" style="display: flex; gap: 10px; align-items: center;">
+                <select id="languageSelector" style="background: #1a1a2e; color: white; border: 1px solid #333; border-radius: 6px; padding: 5px 10px; font-size: 0.85rem; cursor: pointer;">
+                    <option value="en">🇺🇸 English</option>
+                    <option value="es">🇪🇸 Español</option>
+                    <option value="fr">🇫🇷 Français</option>
+                    <option value="de">🇩🇪 Deutsch</option>
+                    <option value="zh">🇨🇳 中文</option>
+                    <option value="ja">🇯🇵 日本語</option>
+                    <option value="ar">🇸🇦 العربية</option>
+                    <option value="pt">🇧🇷 Português</option>
+                    <option value="ru">🇷🇺 Русский</option>
+                    <option value="hi">🇮🇳 हिन्दी</option>
+                </select>
                 <span id="userDisplay" style="color: #a0a0a0; font-size: 0.85rem;">Guest</span>
                 <button id="loginBtn" class="nav-link" style="background: transparent; border: 1px solid #4a90e2; cursor: pointer;">Login</button>
                 <button id="signupBtn" class="nav-link" style="background: linear-gradient(135deg, #4a90e2 0%, #50c878 100%); cursor: pointer;">Sign Up</button>
@@ -1686,6 +1700,24 @@ const sellSettings = {
                             <button class="btn btn-primary" style="margin-top: 20px;">Start New Discussion</button>
                         </div>
                         <div class="forum-sidebar">
+                            <h3 style="margin-bottom: 20px;">Social Features</h3>
+                            <div class="stat-card" style="margin-bottom: 15px;">
+                                <h4>Share Strategy</h4>
+                                <p style="color: #a0a0a0; font-size: 0.85rem; margin-bottom: 10px;">Share your winning strategies with the community</p>
+                                <button class="btn btn-primary" style="width: 100%; font-size: 0.85rem;">Share Now</button>
+                            </div>
+                            <div class="stat-card" style="margin-bottom: 15px;">
+                                <h4>Follow Traders</h4>
+                                <p style="color: #a0a0a0; font-size: 0.85rem; margin-bottom: 10px;">Follow top performers and get notified</p>
+                                <button class="btn btn-primary" style="width: 100%; font-size: 0.85rem;">Find Traders</button>
+                            </div>
+                            <div class="stat-card">
+                                <h4>Strategy Marketplace</h4>
+                                <p style="color: #a0a0a0; font-size: 0.85rem; margin-bottom: 10px;">Buy/sell proven trading strategies</p>
+                                <button class="btn btn-primary" style="width: 100%; font-size: 0.85rem;">Browse</button>
+                            </div>
+                        </div>
+                        <div class="forum-sidebar">
                             <h3 style="margin-bottom: 20px;">Community Stats</h3>
                             <div class="stat-card" style="margin-bottom: 15px;">
                                 <h3>Total Members</h3>
@@ -2243,6 +2275,191 @@ const sellSettings = {
                 </div>
             </div>
             
+            <!-- Leaderboard Page -->
+            <div id="leaderboard" class="page">
+                <div class="dashboard">
+                    <div class="dashboard-header">
+                        <h1>Leaderboard</h1>
+                        <p>Top traders worldwide</p>
+                    </div>
+                    <div class="dashboard-content">
+                        <div class="dashboard-stats">
+                            <div class="stat-card"><h3>Total Traders</h3><div class="value">12,456</div></div>
+                            <div class="stat-card"><h3>Active Today</h3><div class="value">3,891</div></div>
+                            <div class="stat-card"><h3>Total Volume</h3><div class="value">$45.2M</div></div>
+                        </div>
+                        <div style="margin-top: 30px;">
+                            <h3>Top Traders This Week</h3>
+                            <div style="background: #252538; padding: 20px; border-radius: 10px; margin-top: 20px;">
+                                <div style="display: grid; grid-template-columns: 1fr 2fr 1fr 1fr 1fr 1fr; gap: 15px; color: #667eea; font-weight: 600; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #333;">
+                                    <div>Rank</div><div>Trader</div><div>Profit</div><div>Win Rate</div><div>Trades</div><div>Badge</div>
+                                </div>
+                                <div style="display: grid; grid-template-columns: 1fr 2fr 1fr 1fr 1fr 1fr; gap: 15px; padding: 15px 0; border-bottom: 1px solid #333; align-items: center; background: linear-gradient(90deg, rgba(255,215,0,0.1) 0%, transparent 100%);">
+                                    <div style="font-size: 1.5rem;">🥇</div>
+                                    <div><strong>CryptoKing</strong><br><small style="color: #a0a0a0;">@cryptoking</small></div>
+                                    <div style="color: #4caf50;">+$125,430</div>
+                                    <div style="color: #50c878;">92%</div>
+                                    <div>1,245</div>
+                                    <div><span style="background: #ffd700; color: #000; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem;">Elite</span></div>
+                                </div>
+                                <div style="display: grid; grid-template-columns: 1fr 2fr 1fr 1fr 1fr 1fr; gap: 15px; padding: 15px 0; border-bottom: 1px solid #333; align-items: center; background: linear-gradient(90deg, rgba(192,192,192,0.1) 0%, transparent 100%);">
+                                    <div style="font-size: 1.5rem;">🥈</div>
+                                    <div><strong>ForexMaster</strong><br><small style="color: #a0a0a0;">@forexmaster</small></div>
+                                    <div style="color: #4caf50;">+$98,250</div>
+                                    <div style="color: #50c878;">89%</div>
+                                    <div>987</div>
+                                    <div><span style="background: #c0c0c0; color: #000; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem;">Pro</span></div>
+                                </div>
+                                <div style="display: grid; grid-template-columns: 1fr 2fr 1fr 1fr 1fr 1fr; gap: 15px; padding: 15px 0; border-bottom: 1px solid #333; align-items: center; background: linear-gradient(90deg, rgba(205,127,50,0.1) 0%, transparent 100%);">
+                                    <div style="font-size: 1.5rem;">🥉</div>
+                                    <div><strong>TradingNinja</strong><br><small style="color: #a0a0a0;">@tradingninja</small></div>
+                                    <div style="color: #4caf50;">+$76,890</div>
+                                    <div style="color: #50c878;">87%</div>
+                                    <div>756</div>
+                                    <div><span style="background: #cd7f32; color: #000; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem;">Pro</span></div>
+                                </div>
+                                <div style="display: grid; grid-template-columns: 1fr 2fr 1fr 1fr 1fr 1fr; gap: 15px; padding: 15px 0; border-bottom: 1px solid #333; align-items: center;">
+                                    <div style="font-size: 1.2rem; color: #a0a0a0;">4</div>
+                                    <div><strong>ProfitHunter</strong><br><small style="color: #a0a0a0;">@profithunter</small></div>
+                                    <div style="color: #4caf50;">+$54,320</div>
+                                    <div style="color: #50c878;">85%</div>
+                                    <div>623</div>
+                                    <div><span style="background: #4a90e2; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem;">Star</span></div>
+                                </div>
+                                <div style="display: grid; grid-template-columns: 1fr 2fr 1fr 1fr 1fr 1fr; gap: 15px; padding: 15px 0; border-bottom: 1px solid #333; align-items: center;">
+                                    <div style="font-size: 1.2rem; color: #a0a0a0;">5</div>
+                                    <div><strong>MarketWizard</strong><br><small style="color: #a0a0a0;">@marketwizard</small></div>
+                                    <div style="color: #4caf50;">+$48,760</div>
+                                    <div style="color: #50c878;">84%</div>
+                                    <div>598</div>
+                                    <div><span style="background: #4a90e2; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem;">Star</span></div>
+                                </div>
+                                <div style="display: grid; grid-template-columns: 1fr 2fr 1fr 1fr 1fr 1fr; gap: 15px; padding: 15px 0; border-bottom: 1px solid #333; align-items: center;">
+                                    <div style="font-size: 1.2rem; color: #a0a0a0;">6</div>
+                                    <div><strong>BotExpert</strong><br><small style="color: #a0a0a0;">@botexpert</small></div>
+                                    <div style="color: #4caf50;">+$42,150</div>
+                                    <div style="color: #50c878;">82%</div>
+                                    <div>545</div>
+                                    <div><span style="background: #50c878; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem;">Rising</span></div>
+                                </div>
+                                <div style="display: grid; grid-template-columns: 1fr 2fr 1fr 1fr 1fr 1fr; gap: 15px; padding: 15px 0; border-bottom: 1px solid #333; align-items: center;">
+                                    <div style="font-size: 1.2rem; color: #a0a0a0;">7</div>
+                                    <div><strong>DayTraderPro</strong><br><small style="color: #a0a0a0;">@daytraderpro</small></div>
+                                    <div style="color: #4caf50;">+$38,920</div>
+                                    <div style="color: #50c878;">81%</div>
+                                    <div>512</div>
+                                    <div><span style="background: #50c878; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem;">Rising</span></div>
+                                </div>
+                                <div style="display: grid; grid-template-columns: 1fr 2fr 1fr 1fr 1fr 1fr; gap: 15px; padding: 15px 0; align-items: center;">
+                                    <div style="font-size: 1.2rem; color: #a0a0a0;">8</div>
+                                    <div><strong>SwingTrader</strong><br><small style="color: #a0a0a0;">@swingtrader</small></div>
+                                    <div style="color: #4caf50;">+$35,680</div>
+                                    <div style="color: #50c878;">80%</div>
+                                    <div>489</div>
+                                    <div><span style="background: #667eea; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem;">New</span></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 30px;">
+                            <h3>Your Ranking</h3>
+                            <div style="background: #1a1a2e; padding: 20px; border-radius: 12px; margin-top: 20px; text-align: center;">
+                                <div style="font-size: 3rem; color: #4a90e2; font-weight: bold;">#1,234</div>
+                                <div style="color: #a0a0a0; margin-top: 10px;">Your current global ranking</div>
+                                <div style="margin-top: 20px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+                                    <div>
+                                        <div style="font-size: 1.5rem; color: #4caf50;">+$2,450</div>
+                                        <div style="color: #a0a0a0; font-size: 0.85rem;">This Week</div>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 1.5rem; color: #50c878;">76%</div>
+                                        <div style="color: #a0a0a0; font-size: 0.85rem;">Win Rate</div>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 1.5rem; color: #667eea;">156</div>
+                                        <div style="color: #a0a0a0; font-size: 0.85rem;">Total Trades</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Admin Dashboard Page -->
+            <div id="admin-dashboard" class="page">
+                <div class="dashboard">
+                    <div class="dashboard-header">
+                        <h1>Admin Dashboard</h1>
+                        <p>Manage users and platform analytics</p>
+                    </div>
+                    <div class="dashboard-content">
+                        <div class="dashboard-stats">
+                            <div class="stat-card"><h3>Total Users</h3><div class="value">12,456</div></div>
+                            <div class="stat-card"><h3>Active Today</h3><div class="value">3,891</div></div>
+                            <div class="stat-card"><h3>Premium Users</h3><div class="value">1,234</div></div>
+                            <div class="stat-card"><h3>Revenue (MTD)</h3><div class="value">$45,230</div></div>
+                        </div>
+                        <div style="margin-top: 30px;">
+                            <h3>User Management</h3>
+                            <div style="background: #252538; padding: 20px; border-radius: 10px; margin-top: 20px;">
+                                <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; color: #667eea; font-weight: 600; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #333;">
+                                    <div>ID</div><div>Email</div><div>Verified</div><div>Plan</div><div>Actions</div>
+                                </div>
+                                <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; padding: 15px 0; border-bottom: 1px solid #333; align-items: center;">
+                                    <div>#1</div>
+                                    <div>user1@example.com</div>
+                                    <div style="color: #4caf50;">✓</div>
+                                    <div><span style="background: #ffd700; color: #000; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem;">Elite</span></div>
+                                    <div><button class="btn btn-primary" style="padding: 5px 10px; font-size: 0.75rem;">Edit</button></div>
+                                </div>
+                                <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; padding: 15px 0; border-bottom: 1px solid #333; align-items: center;">
+                                    <div>#2</div>
+                                    <div>user2@example.com</div>
+                                    <div style="color: #4caf50;">✓</div>
+                                    <div><span style="background: #c0c0c0; color: #000; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem;">Pro</span></div>
+                                    <div><button class="btn btn-primary" style="padding: 5px 10px; font-size: 0.75rem;">Edit</button></div>
+                                </div>
+                                <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; padding: 15px 0; border-bottom: 1px solid #333; align-items: center;">
+                                    <div>#3</div>
+                                    <div>user3@example.com</div>
+                                    <div style="color: #f44336;">✗</div>
+                                    <div><span style="background: #667eea; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem;">Free</span></div>
+                                    <div><button class="btn btn-primary" style="padding: 5px 10px; font-size: 0.75rem;">Edit</button></div>
+                                </div>
+                                <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; padding: 15px 0; align-items: center;">
+                                    <div>#4</div>
+                                    <div>user4@example.com</div>
+                                    <div style="color: #4caf50;">✓</div>
+                                    <div><span style="background: #667eea; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem;">Free</span></div>
+                                    <div><button class="btn btn-primary" style="padding: 5px 10px; font-size: 0.75rem;">Edit</button></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 30px;">
+                            <h3>Platform Analytics</h3>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 20px;">
+                                <div style="background: #1a1a2e; padding: 20px; border-radius: 12px;">
+                                    <h4 style="color: #4a90e2; margin-bottom: 10px;">Registrations (Today)</h4>
+                                    <div style="font-size: 2rem; color: #50c878;">+156</div>
+                                </div>
+                                <div style="background: #1a1a2e; padding: 20px; border-radius: 12px;">
+                                    <h4 style="color: #4a90e2; margin-bottom: 10px;">Active Sessions</h4>
+                                    <div style="font-size: 2rem; color: #50c878;">1,234</div>
+                                </div>
+                                <div style="background: #1a1a2e; padding: 20px; border-radius: 12px;">
+                                    <h4 style="color: #4a90e2; margin-bottom: 10px;">Trades Executed</h4>
+                                    <div style="font-size: 2rem; color: #50c878;">8,456</div>
+                                </div>
+                                <div style="background: #1a1a2e; padding: 20px; border-radius: 12px;">
+                                    <h4 style="color: #4a90e2; margin-bottom: 10px;">API Calls (Today)</h4>
+                                    <div style="font-size: 2rem; color: #50c878;">45,678</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
         <!-- LiveChat script -->
         <script type="text/javascript" defer="">
             window.__lc = window.__lc || {};
@@ -2290,6 +2507,586 @@ const sellSettings = {
 const API_BASE = window.location.origin.includes('localhost')
     ? 'http://localhost:3001'
     : 'https://lian-traders-api.onrender.com';
+
+// Multi-language Support
+const translations = {
+    en: {
+        navBrand: 'Trading Mastery',
+        dashboard: 'Dashboard',
+        botEditor: 'Bot Editor',
+        speedbot: 'Speedbot',
+        tradingSoftware: 'Trading Software',
+        dualEdge: 'Dual Edge',
+        apexMarket: 'Apex Market',
+        manualTrader: 'Manual Trader',
+        analysistool: 'Analysistool',
+        ldpTool: 'LDP Tool',
+        charts: 'Charts',
+        copyTrading: 'Copy Trading',
+        education: 'Education',
+        community: 'Community',
+        login: 'Login',
+        signup: 'Sign Up',
+        logout: 'Logout',
+        guest: 'Guest',
+        heroTitle: 'Trading Mastery - Your Ultimate Partner in Trading Success',
+        heroSubtitle: 'At Trading Mastery, we don\'t just teach trading — we build traders. Join a growing community where you\'ll access: proven strategies, real-time mentorship, and powerful tools designed to boost trading consistency and profitability.',
+        getStarted: 'Get Started Free',
+        viewDemo: 'View Demo',
+        everythingYouNeed: 'Everything You Need to Succeed',
+        provenStrategies: 'Proven Strategies',
+        provenStrategiesDesc: 'Access battle-tested trading strategies used by professional traders worldwide',
+        realTimeMentorship: 'Real-time Mentorship',
+        realTimeMentorshipDesc: 'Learn directly from experienced traders through live sessions and one-on-one coaching',
+        powerfulTools: 'Powerful Tools',
+        powerfulToolsDesc: 'Advanced analytics, automated bots, and risk management tools at your fingertips',
+        liveTradingRoom: 'Live Trading Room',
+        liveTradingRoomDesc: 'Watch professional traders execute live trades and learn their strategies in real-time',
+        comprehensiveEducation: 'Comprehensive Education',
+        comprehensiveEducationDesc: 'From beginner basics to advanced techniques, master every aspect of trading',
+        globalCommunity: 'Global Community',
+        globalCommunityDesc: 'Connect with thousands of traders worldwide and share insights 24/7',
+        activeTraders: 'Active Traders',
+        successRate: 'Success Rate',
+        profitsGenerated: 'Profits Generated',
+        supportAvailable: 'Support Available',
+        chooseYourPath: 'Choose Your Path to Success',
+        starter: 'Starter',
+        professional: 'Professional',
+        elite: 'Elite',
+        mostPopular: 'Most Popular',
+        getStarted: 'Get Started',
+        whatOurTradersSay: 'What Our Traders Say',
+        readyToStart: 'Ready to Start Your Trading Journey?',
+        joinThousands: 'Join thousands of successful traders who have transformed their careers with Trading Mastery',
+        getStartedToday: 'Get Started Today'
+    },
+    es: {
+        navBrand: 'Trading Mastery',
+        dashboard: 'Panel',
+        botEditor: 'Editor de Bots',
+        speedbot: 'Speedbot',
+        tradingSoftware: 'Software de Trading',
+        dualEdge: 'Dual Edge',
+        apexMarket: 'Mercado Apex',
+        manualTrader: 'Trader Manual',
+        analysistool: 'Herramienta de Análisis',
+        ldpTool: 'Herramienta LDP',
+        charts: 'Gráficos',
+        copyTrading: 'Copy Trading',
+        education: 'Educación',
+        community: 'Comunidad',
+        login: 'Iniciar Sesión',
+        signup: 'Registrarse',
+        logout: 'Cerrar Sesión',
+        guest: 'Invitado',
+        heroTitle: 'Trading Mastery - Tu Socio Definitivo en el Éxito del Trading',
+        heroSubtitle: 'En Trading Mastery, no solo enseñamos trading — construimos traders. Únete a una comunidad en crecimiento donde accederás: estrategias probadas, mentoría en tiempo real y herramientas poderosas diseñadas para mejorar la consistencia y rentabilidad del trading.',
+        getStarted: 'Comenzar Gratis',
+        viewDemo: 'Ver Demo',
+        everythingYouNeed: 'Todo lo que Necesitas para Tener Éxito',
+        provenStrategies: 'Estrategias Probadas',
+        provenStrategiesDesc: 'Accede a estrategias de trading probadas en batalla utilizadas por traders profesionales en todo el mundo',
+        realTimeMentorship: 'Mentoría en Tiempo Real',
+        realTimeMentorshipDesc: 'Aprende directamente de traders experimentados a través de sesiones en vivo y coaching uno a uno',
+        powerfulTools: 'Herramientas Poderosas',
+        powerfulToolsDesc: 'Análisis avanzados, bots automatizados y herramientas de gestión de riesgos a tu alcance',
+        liveTradingRoom: 'Sala de Trading en Vivo',
+        liveTradingRoomDesc: 'Observa a traders profesionales ejecutar operaciones en vivo y aprende sus estrategias en tiempo real',
+        comprehensiveEducation: 'Educación Integral',
+        comprehensiveEducationDesc: 'Desde lo básico para principiantes hasta técnicas avanzadas, domina todos los aspectos del trading',
+        globalCommunity: 'Comunidad Global',
+        globalCommunityDesc: 'Conecta con miles de traders en todo el mundo y comparte ideas 24/7',
+        activeTraders: 'Traders Activos',
+        successRate: 'Tasa de Éxito',
+        profitsGenerated: 'Beneficios Generados',
+        supportAvailable: 'Soporte Disponible',
+        chooseYourPath: 'Elige Tu Camino al Éxito',
+        starter: 'Principiante',
+        professional: 'Profesional',
+        elite: 'Élite',
+        mostPopular: 'Más Popular',
+        getStarted: 'Comenzar',
+        whatOurTradersSay: 'Lo que Dicen Nuestros Traders',
+        readyToStart: '¿Listo para Comenzar Tu Viaje de Trading?',
+        joinThousands: 'Únete a miles de traders exitosos que han transformado sus carreras con Trading Mastery',
+        getStartedToday: 'Comenzar Hoy'
+    },
+    fr: {
+        navBrand: 'Trading Mastery',
+        dashboard: 'Tableau de bord',
+        botEditor: 'Éditeur de Bot',
+        speedbot: 'Speedbot',
+        tradingSoftware: 'Logiciel de Trading',
+        dualEdge: 'Dual Edge',
+        apexMarket: 'Marché Apex',
+        manualTrader: 'Trader Manuel',
+        analysistool: 'Outil d\'Analyse',
+        ldpTool: 'Outil LDP',
+        charts: 'Graphiques',
+        copyTrading: 'Copy Trading',
+        education: 'Éducation',
+        community: 'Communauté',
+        login: 'Connexion',
+        signup: 'S\'inscrire',
+        logout: 'Déconnexion',
+        guest: 'Invité',
+        heroTitle: 'Trading Mastery - Votre Partenaire Ultime pour le Succès en Trading',
+        heroSubtitle: 'Chez Trading Mastery, nous n\'enseignons pas seulement le trading — nous construisons des traders. Rejoignez une communauté en croissance où vous aurez accès: des stratégies éprouvées, un mentorat en temps réel et des outils puissants conçus pour améliorer la cohérence et la rentabilité du trading.',
+        getStarted: 'Commencer Gratuitement',
+        viewDemo: 'Voir la Démo',
+        everythingYouNeed: 'Tout ce Dont Vous Avez Besoin pour Réussir',
+        provenStrategies: 'Stratégies Éprouvées',
+        provenStrategiesDesc: 'Accédez aux stratégies de trading testées au combat utilisées par les traders professionnels du monde entier',
+        realTimeMentorship: 'Mentorat en Temps Réel',
+        realTimeMentorshipDesc: 'Apprenez directement de traders expérimentés via des sessions en direct et un coaching individuel',
+        powerfulTools: 'Outils Puissants',
+        powerfulToolsDesc: 'Analyses avancées, bots automatisés et outils de gestion des risques à portée de main',
+        liveTradingRoom: 'Salle de Trading en Direct',
+        liveTradingRoomDesc: 'Regardez les traders professionnels exécuter des transactions en direct et apprenez leurs stratégies en temps réel',
+        comprehensiveEducation: 'Éducation Complète',
+        comprehensiveEducationDesc: 'Des bases pour débutants aux techniques avancées, maîtrisez tous les aspects du trading',
+        globalCommunity: 'Communauté Mondiale',
+        globalCommunityDesc: 'Connectez-vous avec des milliers de traders dans le monde entier et partagez des idées 24/7',
+        activeTraders: 'Traders Actifs',
+        successRate: 'Taux de Réussite',
+        profitsGenerated: 'Bénéfices Générés',
+        supportAvailable: 'Support Disponible',
+        chooseYourPath: 'Choisissez Votre Chemin Vers le Succès',
+        starter: 'Débutant',
+        professional: 'Professionnel',
+        elite: 'Élite',
+        mostPopular: 'Le Plus Populaire',
+        getStarted: 'Commencer',
+        whatOurTradersSay: 'Ce Que Disent Nos Traders',
+        readyToStart: 'Prêt à Commencer Votre Voyage de Trading?',
+        joinThousands: 'Rejoignez des milliers de traders qui ont transformé leur carrière avec Trading Mastery',
+        getStartedToday: 'Commencer Aujourd\'hui'
+    },
+    de: {
+        navBrand: 'Trading Mastery',
+        dashboard: 'Dashboard',
+        botEditor: 'Bot-Editor',
+        speedbot: 'Speedbot',
+        tradingSoftware: 'Trading-Software',
+        dualEdge: 'Dual Edge',
+        apexMarket: 'Apex Markt',
+        manualTrader: 'Manueller Trader',
+        analysistool: 'Analysetool',
+        ldpTool: 'LDP-Tool',
+        charts: 'Charts',
+        copyTrading: 'Copy Trading',
+        education: 'Bildung',
+        community: 'Community',
+        login: 'Anmelden',
+        signup: 'Registrieren',
+        logout: 'Abmelden',
+        guest: 'Gast',
+        heroTitle: 'Trading Mastery - Ihr Ultimativer Partner für den Trading-Erfolg',
+        heroSubtitle: 'Bei Trading Mastery unterrichten wir nicht nur Trading — wir bauen Trader auf. Treten Sie einer wachsenden Community bei, in der Sie Zugang haben: bewährte Strategien, Echtzeit-Mentoring und leistungsstarke Tools, die darauf ausgelegt sind, die Konsistenz und Rentabilität des Tradings zu verbessern.',
+        getStarted: 'Kostenlos Starten',
+        viewDemo: 'Demo Ansehen',
+        everythingYouNeed: 'Alles, Was Sie Zum Erfolg Brauchen',
+        provenStrategies: 'Bewährte Strategien',
+        provenStrategiesDesc: 'Zugang zu kampferprobten Trading-Strategien, die von professionellen Tradern weltweit verwendet werden',
+        realTimeMentorship: 'Echtzeit-Mentoring',
+        realTimeMentorshipDesc: 'Lernen Sie direkt von erfahrenen Tradern durch Live-Sessions und Einzel-Coaching',
+        powerfulTools: 'Leistungsstarke Tools',
+        powerfulToolsDesc: 'Erweiterte Analysen, automatisierte Bots und Risikomanagement-Tools auf Knopfdruck',
+        liveTradingRoom: 'Live Trading Room',
+        liveTradingRoomDesc: 'Beobachten Sie professionelle Trader beim Ausführen von Live-Trades und lernen Sie ihre Strategien in Echtzeit',
+        comprehensiveEducation: 'Umfassende Bildung',
+        comprehensiveEducationDesc: 'Von den Grundlagen für Anfänger bis zu fortgeschrittenen Techniken, meistern Sie jeden Aspekt des Tradings',
+        globalCommunity: 'Globale Community',
+        globalCommunityDesc: 'Verbinden Sie sich mit Tausenden von Tradern weltweit und teilen Sie Erkenntnisse 24/7',
+        activeTraders: 'Aktive Trader',
+        successRate: 'Erfolgsquote',
+        profitsGenerated: 'Generierte Gewinne',
+        supportAvailable: 'Support Verfügbar',
+        chooseYourPath: 'Wählen Sie Ihren Weg Zum Erfolg',
+        starter: 'Einsteiger',
+        professional: 'Professionell',
+        elite: 'Elite',
+        mostPopular: 'Am Beliebtesten',
+        getStarted: 'Starten',
+        whatOurTradersSay: 'Was Unsere Trader Sagen',
+        readyToStart: 'Bereit, Ihre Trading-Reise Zu Beginnen?',
+        joinThousands: 'Schließen Sie sich Tausenden erfolgreicher Trader an, die ihre Karriere mit Trading Mastery transformiert haben',
+        getStartedToday: 'Heute Starten'
+    },
+    zh: {
+        navBrand: 'Trading Mastery',
+        dashboard: '仪表板',
+        botEditor: '机器人编辑器',
+        speedbot: 'Speedbot',
+        tradingSoftware: '交易软件',
+        dualEdge: 'Dual Edge',
+        apexMarket: 'Apex 市场',
+        manualTrader: '手动交易',
+        analysistool: '分析工具',
+        ldpTool: 'LDP 工具',
+        charts: '图表',
+        copyTrading: '跟单交易',
+        education: '教育',
+        community: '社区',
+        login: '登录',
+        signup: '注册',
+        logout: '退出',
+        guest: '访客',
+        heroTitle: 'Trading Mastery - 您交易成功的终极合作伙伴',
+        heroSubtitle: '在 Trading Mastery，我们不仅教授交易——我们培养交易者。加入一个不断发展的社区，您将获得：经过验证的策略、实时指导和强大工具，旨在提高交易的一致性和盈利能力。',
+        getStarted: '免费开始',
+        viewDemo: '查看演示',
+        everythingYouNeed: '成功所需的一切',
+        provenStrategies: '经过验证的策略',
+        provenStrategiesDesc: '访问全球专业交易者使用的经过实战检验的交易策略',
+        realTimeMentorship: '实时指导',
+        realTimeMentorshipDesc: '通过实时课程和一对一指导直接向经验丰富的交易者学习',
+        powerfulTools: '强大的工具',
+        powerfulToolsDesc: '先进的分析、自动化机器人和风险管理工具触手可及',
+        liveTradingRoom: '实时交易室',
+        liveTradingRoomDesc: '观看专业交易者执行实时交易并实时学习他们的策略',
+        comprehensiveEducation: '全面教育',
+        comprehensiveEducationDesc: '从初学者基础到高级技术，掌握交易的各个方面',
+        globalCommunity: '全球社区',
+        globalCommunityDesc: '与全球数千名交易者联系并全天候分享见解',
+        activeTraders: '活跃交易者',
+        successRate: '成功率',
+        profitsGenerated: '产生的利润',
+        supportAvailable: '支持可用',
+        chooseYourPath: '选择您的成功之路',
+        starter: '入门',
+        professional: '专业',
+        elite: '精英',
+        mostPopular: '最受欢迎',
+        getStarted: '开始',
+        whatOurTradersSay: '我们的交易者说',
+        readyToStart: '准备好开始您的交易之旅了吗？',
+        joinThousands: '加入数千名通过 Trading Mastery 改变职业生涯的成功交易者',
+        getStartedToday: '今天开始'
+    },
+    ja: {
+        navBrand: 'Trading Mastery',
+        dashboard: 'ダッシュボード',
+        botEditor: 'ボットエディター',
+        speedbot: 'Speedbot',
+        tradingSoftware: '取引ソフトウェア',
+        dualEdge: 'Dual Edge',
+        apexMarket: 'Apexマーケット',
+        manualTrader: 'マニュアルトレーダー',
+        analysistool: '分析ツール',
+        ldpTool: 'LDPツール',
+        charts: 'チャート',
+        copyTrading: 'コピートレード',
+        education: '教育',
+        community: 'コミュニティ',
+        login: 'ログイン',
+        signup: 'サインアップ',
+        logout: 'ログアウト',
+        guest: 'ゲスト',
+        heroTitle: 'Trading Mastery - 取引成功の究極のパートナー',
+        heroSubtitle: 'Trading Masteryでは、取引を教えるだけでなく、トレーダーを育成します。成長し続けるコミュニティに参加して、実証済みの戦略、リアルタイムのメンターシップ、取引の一貫性と収益性を向上させるために設計された強力なツールにアクセスしてください。',
+        getStarted: '無料で始める',
+        viewDemo: 'デモを見る',
+        everythingYouNeed: '成功に必要なすべて',
+        provenStrategies: '実証済みの戦略',
+        provenStrategiesDesc: '世界中のプロフェッショナルトレーダーが使用する実戦テスト済みの取引戦略にアクセス',
+        realTimeMentorship: 'リアルタイムメンターシップ',
+        realTimeMentorshipDesc: 'ライブセッションと個別コーチングを通じて経験豊富なトレーダーから直接学ぶ',
+        powerfulTools: '強力なツール',
+        powerfulToolsDesc: '高度な分析、自動化ボット、リスク管理ツールを指先で',
+        liveTradingRoom: 'ライブ取引ルーム',
+        liveTradingRoomDesc: 'プロフェッショナルトレーダーがライブ取引を実行するのを見て、リアルタイムで戦略を学ぶ',
+        comprehensiveEducation: '包括的な教育',
+        comprehensiveEducationDesc: '初心者の基礎から高度な技術まで、取引のすべての側面をマスター',
+        globalCommunity: 'グローバルコミュニティ',
+        globalCommunityDesc: '世界中の数千人のトレーダーとつながり、24時間365日インサイトを共有',
+        activeTraders: 'アクティブトレーダー',
+        successRate: '成功率',
+        profitsGenerated: '生成された利益',
+        supportAvailable: 'サポート利用可能',
+        chooseYourPath: '成功への道を選ぶ',
+        starter: 'スターター',
+        professional: 'プロフェッショナル',
+        elite: 'エリート',
+        mostPopular: '最も人気',
+        getStarted: '開始',
+        whatOurTradersSay: 'トレーダーの声',
+        readyToStart: '取引の旅を始める準備はできましたか？',
+        joinThousands: 'Trading Masteryでキャリアを変えた何千人もの成功したトレーダーに参加',
+        getStartedToday: '今日始める'
+    },
+    ar: {
+        navBrand: 'Trading Mastery',
+        dashboard: 'لوحة التحكم',
+        botEditor: 'محرر البوت',
+        speedbot: 'Speedbot',
+        tradingSoftware: 'برمجيات التداول',
+        dualEdge: 'Dual Edge',
+        apexMarket: 'سوق Apex',
+        manualTrader: 'المتداول اليدوي',
+        analysistool: 'أداة التحليل',
+        ldpTool: 'أداة LDP',
+        charts: 'الرسوم البيانية',
+        copyTrading: 'نسخ التداول',
+        education: 'التعليم',
+        community: 'المجتمع',
+        login: 'تسجيل الدخول',
+        signup: 'التسجيل',
+        logout: 'تسجيل الخروج',
+        guest: 'زائر',
+        heroTitle: 'Trading Mastery - شريكك النهائي لنجاح التداول',
+        heroSubtitle: 'في Trading Mastery، لا نعلم التداول فقط — نبني المتداولين. انضم إلى مجتمع متنامٍ حيث ستصل إلى: استراتيجيات مثبتة، إرشاد في الوقت الفعلي، وأدوات قوية مصممة لتعزيز اتساق وربحية التداول.',
+        getStarted: 'ابدأ مجاناً',
+        viewDemo: 'عرض العرض التوضيحي',
+        everythingYouNeed: 'كل ما تحتاجه للنجاح',
+        provenStrategies: 'استراتيجيات مثبتة',
+        provenStrategiesDesc: 'الوصول إلى استراتيجيات التداول المثبتة في المعارك التي يستخدمها المتداولون المحترفون حول العالم',
+        realTimeMentorship: 'الإرشاد في الوقت الفعلي',
+        realTimeMentorshipDesc: 'تعلم مباشرة من المتداولين ذوي الخبرة من خلال جلسات مباشرة وتدريب فردي',
+        powerfulTools: 'أدوات قوية',
+        powerfulToolsDesc: 'تحليلات متقدمة، بوتات آلية، وأدوات إدارة المخاطر في متناول يدك',
+        liveTradingRoom: 'غرفة التداول المباشرة',
+        liveTradingRoomDesc: 'شاهد المتداولين المحترفين ينفذون صفقات مباشرة وتعلم استراتيجياتهم في الوقت الفعلي',
+        comprehensiveEducation: 'تعليم شامل',
+        comprehensiveEducationDesc: 'من الأساسيات للمبتدئين إلى التقنيات المتقدمة، أتقن كل جانب من جوانب التداول',
+        globalCommunity: 'مجتمع عالمي',
+        globalCommunityDesc: 'تواصل مع آلاف المتداولين حول العالم وشارك الأفكار على مدار الساعة',
+        activeTraders: 'المتداولون النشطون',
+        successRate: 'معدل النجاح',
+        profitsGenerated: 'الأرباح المُنشأة',
+        supportAvailable: 'الدعم متاح',
+        chooseYourPath: 'اختر طريقك للنجاح',
+        starter: 'المبتدئ',
+        professional: 'المحترف',
+        elite: 'النخبة',
+        mostPopular: 'الأكثر شعبية',
+        getStarted: 'ابدأ',
+        whatOurTradersSay: 'ما يقوله متداولونا',
+        readyToStart: 'هل أنت مستعد لبدء رحلة التداول الخاصة بك؟',
+        joinThousands: 'انضم إلى آلاف المتداولين الناجحين الذين حولوا مسيرتهم المهنية مع Trading Mastery',
+        getStartedToday: 'ابدأ اليوم'
+    },
+    pt: {
+        navBrand: 'Trading Mastery',
+        dashboard: 'Painel',
+        botEditor: 'Editor de Bot',
+        speedbot: 'Speedbot',
+        tradingSoftware: 'Software de Trading',
+        dualEdge: 'Dual Edge',
+        apexMarket: 'Mercado Apex',
+        manualTrader: 'Trader Manual',
+        analysistool: 'Ferramenta de Análise',
+        ldpTool: 'Ferramenta LDP',
+        charts: 'Gráficos',
+        copyTrading: 'Copy Trading',
+        education: 'Educação',
+        community: 'Comunidade',
+        login: 'Entrar',
+        signup: 'Cadastrar',
+        logout: 'Sair',
+        guest: 'Convidado',
+        heroTitle: 'Trading Mastery - Seu Parceiro Definitivo para o Sucesso no Trading',
+        heroSubtitle: 'No Trading Mastery, não apenas ensinamos trading — construímos traders. Junte-se a uma comunidade em crescimento onde você terá acesso: estratégias comprovadas, mentoria em tempo real e ferramentas poderosas projetadas para aumentar a consistência e rentabilidade do trading.',
+        getStarted: 'Começar Grátis',
+        viewDemo: 'Ver Demo',
+        everythingYouNeed: 'Tudo o Que Você Precisa Para Ter Sucesso',
+        provenStrategies: 'Estratégias Comprovadas',
+        provenStrategiesDesc: 'Acesse estratégias de trading testadas em batalha usadas por traders profissionais em todo o mundo',
+        realTimeMentorship: 'Mentoria em Tempo Real',
+        realTimeMentorshipDesc: 'Aprenda diretamente com traders experientes através de sessões ao vivo e coaching individual',
+        powerfulTools: 'Ferramentas Poderosas',
+        powerfulToolsDesc: 'Análises avançadas, bots automatizados e ferramentas de gerenciamento de riscos ao seu alcance',
+        liveTradingRoom: 'Sala de Trading ao Vivo',
+        liveTradingRoomDesc: 'Assista traders profissionais executarem trades ao vivo e aprenda suas estratégias em tempo real',
+        comprehensiveEducation: 'Educação Abrangente',
+        comprehensiveEducationDesc: 'Do básico para iniciantes a técnicas avançadas, domine todos os aspectos do trading',
+        globalCommunity: 'Comunidade Global',
+        globalCommunityDesc: 'Conecte-se com milhares de traders em todo o mundo e compartilhe insights 24/7',
+        activeTraders: 'Traders Ativos',
+        successRate: 'Taxa de Sucesso',
+        profitsGenerated: 'Lucros Gerados',
+        supportAvailable: 'Suporte Disponível',
+        chooseYourPath: 'Escolha Seu Caminho Para o Sucesso',
+        starter: 'Iniciante',
+        professional: 'Profissional',
+        elite: 'Elite',
+        mostPopular: 'Mais Popular',
+        getStarted: 'Começar',
+        whatOurTradersSay: 'O Que Nossos Traders Dizem',
+        readyToStart: 'Pronto Para Começar Sua Jornada de Trading?',
+        joinThousands: 'Junte-se a milhares de traders de sucesso que transformaram suas carreiras com Trading Mastery',
+        getStartedToday: 'Começar Hoje'
+    },
+    ru: {
+        navBrand: 'Trading Mastery',
+        dashboard: 'Панель',
+        botEditor: 'Редактор ботов',
+        speedbot: 'Speedbot',
+        tradingSoftware: 'Торговое программное обеспечение',
+        dualEdge: 'Dual Edge',
+        apexMarket: 'Рынок Apex',
+        manualTrader: 'Ручной трейдер',
+        analysistool: 'Инструмент анализа',
+        ldpTool: 'Инструмент LDP',
+        charts: 'Графики',
+        copyTrading: 'Копирование торговли',
+        education: 'Образование',
+        community: 'Сообщество',
+        login: 'Войти',
+        signup: 'Регистрация',
+        logout: 'Выйти',
+        guest: 'Гость',
+        heroTitle: 'Trading Mastery - Ваш идеальный партнер для успеха в торговле',
+        heroSubtitle: 'В Trading Mastery мы не просто учим торговле — мы создаем трейдеров. Присоединяйтесь к растущему сообществу, где вы получите доступ: проверенным стратегиям, наставничеству в реальном времени и мощным инструментам, разработанным для повышения стабильности и прибыльности торговли.',
+        getStarted: 'Начать бесплатно',
+        viewDemo: 'Посмотреть демо',
+        everythingYouNeed: 'Все, что вам нужно для успеха',
+        provenStrategies: 'Проверенные стратегии',
+        provenStrategiesDesc: 'Доступ к проверенным в боях торговым стратегиям, используемым профессиональными трейдерами по всему миру',
+        realTimeMentorship: 'Наставничество в реальном времени',
+        realTimeMentorshipDesc: 'Учитесь напрямую у опытных трейдеров через живые сессии и индивидуальное коучинг',
+        powerfulTools: 'Мощные инструменты',
+        powerfulToolsDesc: 'Расширенная аналитика, автоматизированные боты и инструменты управления рисками под рукой',
+        liveTradingRoom: 'Живая торговая комната',
+        liveTradingRoomDesc: 'Смотрите, как профессиональные трейдеры выполняют сделки в реальном времени и учитесь их стратегиям',
+        comprehensiveEducation: 'Комплексное образование',
+        comprehensiveEducationDesc: 'От основ для начинающих до продвинутых техник, овладейте всеми аспектами торговли',
+        globalCommunity: 'Глобальное сообщество',
+        globalCommunityDesc: 'Связывайтесь с тысячами трейдеров по всему миру и делитесь идеями 24/7',
+        activeTraders: 'Активные трейдеры',
+        successRate: 'Успешность',
+        profitsGenerated: 'Полученная прибыль',
+        supportAvailable: 'Поддержка доступна',
+        chooseYourPath: 'Выберите свой путь к успеху',
+        starter: 'Начинающий',
+        professional: 'Профессиональный',
+        elite: 'Элитный',
+        mostPopular: 'Самый популярный',
+        getStarted: 'Начать',
+        whatOurTradersSay: 'Что говорят наши трейдеры',
+        readyToStart: 'Готовы начать свой торговый путь?',
+        joinThousands: 'Присоединяйтесь к тысячам успешных трейдеров, которые преобразили свою карьеру с Trading Mastery',
+        getStartedToday: 'Начать сегодня'
+    },
+    hi: {
+        navBrand: 'Trading Mastery',
+        dashboard: 'डैशबोर्ड',
+        botEditor: 'बॉट एडिटर',
+        speedbot: 'Speedbot',
+        tradingSoftware: 'ट्रेडिंग सॉफ़्टवेयर',
+        dualEdge: 'Dual Edge',
+        apexMarket: 'Apex मार्केट',
+        manualTrader: 'मैनुअल ट्रेडर',
+        analysistool: 'विश्लेषण उपकरण',
+        ldpTool: 'LDP उपकरण',
+        charts: 'चार्ट',
+        copyTrading: 'कॉपी ट्रेडिंग',
+        education: 'शिक्षा',
+        community: 'समुदाय',
+        login: 'लॉग इन',
+        signup: 'साइन अप',
+        logout: 'लॉग आउट',
+        guest: 'अतिथि',
+        heroTitle: 'Trading Mastery - ट्रेडिंग सफलता के लिए आपका अंतिम भागीदार',
+        heroSubtitle: 'Trading Mastery में, हम केवल ट्रेडिंग नहीं सिखाते — हम ट्रेडर बनाते हैं। एक बढ़ते हुए समुदाय से जुड़ें जहां आपको पहुंच मिलेगी: सिद्ध रणनीतियां, रीयल-टाइम मेंटरशिप, और ट्रेडिंग की स्थिरता और लाभप्रदता बढ़ाने के लिए डिज़ाइन किए गए शक्तिशाली उपकरण।',
+        getStarted: 'मुफ्त शुरू करें',
+        viewDemo: 'डेमो देखें',
+        everythingYouNeed: 'सफलता के लिए आपको जो कुछ भी चाहिए',
+        provenStrategies: 'सिद्ध रणनीतियां',
+        provenStrategiesDesc: 'दुनिया भर के पेशेवर ट्रेडर द्वारा उपयोग की जाने वाली युद्ध-परीक्षित ट्रेडिंग रणनीतियों तक पहुंच प्राप्त करें',
+        realTimeMentorship: 'रीयल-टाइम मेंटरशिप',
+        realTimeMentorshipDesc: 'लाइव सत्रों और वन-ऑन-वन कोचिंग के माध्यम से अनुभवी ट्रेडर से सीधे सीखें',
+        powerfulTools: 'शक्तिशाली उपकरण',
+        powerfulToolsDesc: 'उन्नत विश्लेषण, स्वचालित बॉट और जोखिम प्रबंधन उपकरण आपकी उंगलियों पर',
+        liveTradingRoom: 'लाइव ट्रेडिंग रूम',
+        liveTradingRoomDesc: 'पेशेवर ट्रेडरों को लाइव ट्रेड निष्पादित करते हुए देखें और रीयल-टाइम में उनकी रणनीतियां सीखें',
+        comprehensiveEducation: 'व्यापक शिक्षा',
+        comprehensiveEducationDesc: 'शुरुआती बुनियादी बातों से लेकर उन्नत तकनीकों तक, ट्रेडिंग के हर पहलू में महारत हासिल करें',
+        globalCommunity: 'वैश्विक समुदाय',
+        globalCommunityDesc: 'दुनिया भर के हजारों ट्रेडरों से जुड़ें और 24/7 अंतर्दृष्टि साझा करें',
+        activeTraders: 'सक्रिय ट्रेडर',
+        successRate: 'सफलता दर',
+        profitsGenerated: 'उत्पन्न लाभ',
+        supportAvailable: 'सहायता उपलब्ध',
+        chooseYourPath: 'सफलता के लिए अपना मार्ग चुनें',
+        starter: 'शुरुआती',
+        professional: 'पेशेवर',
+        elite: 'एलीट',
+        mostPopular: 'सबसे लोकप्रिय',
+        getStarted: 'शुरू करें',
+        whatOurTradersSay: 'हमारे ट्रेडर क्या कहते हैं',
+        readyToStart: 'क्या आप अपनी ट्रेडिंग यात्रा शुरू करने के लिए तैयार हैं?',
+        joinThousands: 'Trading Mastery के साथ अपना करियर बदलने वाले हजारों सफल ट्रेडरों से जुड़ें',
+        getStartedToday: 'आज शुरू करें'
+    }
+};
+
+let currentLanguage = localStorage.getItem('language') || 'en';
+
+function setLanguage(lang) {
+    currentLanguage = lang;
+    localStorage.setItem('language', lang);
+    updatePageLanguage();
+}
+
+function updatePageLanguage() {
+    const t = translations[currentLanguage];
+    
+    // Update navigation
+    document.querySelectorAll('.nav-link').forEach(link => {
+        const text = link.textContent.trim();
+        if (text === 'Dashboard') link.textContent = t.dashboard;
+        if (text === 'Bot Editor') link.textContent = t.botEditor;
+        if (text === 'Speedbot') link.textContent = t.speedbot;
+        if (text === 'Trading Software') link.textContent = t.tradingSoftware;
+        if (text === 'Dual Edge') link.textContent = t.dualEdge;
+        if (text === 'Apex Market') link.textContent = t.apexMarket;
+        if (text === 'Manual Trader') link.textContent = t.manualTrader;
+        if (text === 'Analysistool') link.textContent = t.analysistool;
+        if (text === 'LDP Tool') link.textContent = t.ldpTool;
+        if (text === 'Charts') link.textContent = t.charts;
+        if (text === 'Copy Trading') link.textContent = t.copyTrading;
+        if (text === 'Education') link.textContent = t.education;
+        if (text === 'Community') link.textContent = t.community;
+    });
+    
+    // Update auth buttons
+    const loginBtn = document.getElementById('loginBtn');
+    const signupBtn = document.getElementById('signupBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const userDisplay = document.getElementById('userDisplay');
+    
+    if (loginBtn) loginBtn.textContent = t.login;
+    if (signupBtn) signupBtn.textContent = t.signup;
+    if (logoutBtn) logoutBtn.textContent = t.logout;
+    if (userDisplay && userDisplay.textContent === 'Guest') userDisplay.textContent = t.guest;
+    
+    // Update hero section
+    const heroTitle = document.querySelector('.hero-title');
+    const heroSubtitle = document.querySelector('.hero-subtitle');
+    if (heroTitle) heroTitle.textContent = t.heroTitle;
+    if (heroSubtitle) heroSubtitle.textContent = t.heroSubtitle;
+    
+    // Update RTL for Arabic
+    if (currentLanguage === 'ar') {
+        document.body.style.direction = 'rtl';
+    } else {
+        document.body.style.direction = 'ltr';
+    }
+}
+
+// Initialize language selector
+document.addEventListener('DOMContentLoaded', function() {
+    const languageSelector = document.getElementById('languageSelector');
+    if (languageSelector) {
+        languageSelector.value = currentLanguage;
+        languageSelector.addEventListener('change', function() {
+            setLanguage(this.value);
+        });
+    }
+    updatePageLanguage();
+});
 
 // Global state
 let authToken = localStorage.getItem('authToken');
