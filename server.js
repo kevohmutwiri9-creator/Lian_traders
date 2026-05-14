@@ -7,6 +7,11 @@ const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
 const path = require('path');
 const axios = require('axios');
+const nodemailer = require('nodemailer');
+const speakeasy = require('speakeasy');
+const qrcode = require('qrcode');
+const stripe = require('stripe');
+const rateLimit = require('express-rate-limit');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -36,6 +41,27 @@ app.use(cors({
   credentials: true
 }));
 app.use(express.json());
+
+// Rate Limiting
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // Limit each IP to 100 requests per windowMs
+    message: 'Too many requests from this IP, please try again later.'
+});
+
+app.use('/api/', limiter);
+
+// Email Configuration
+const transporter = nodemailer.createTransport({
+    service: 'SendGrid',
+    auth: {
+        user: process.env.SENDGRID_API_KEY,
+        pass: process.env.SENDGRID_API_KEY
+    }
+});
+
+// Stripe Configuration
+const stripeClient = stripe(process.env.STRIPE_SECRET_KEY);
 
 // Database setup
 const db = new sqlite3.Database('./trading.db', (err) => {
@@ -134,6 +160,381 @@ wss.on('connection', (ws) => {
   });
 });
 
+// Helper Functions
+const generateVerificationToken = () => {
+    return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+};
+
+const generateReferralCode = () => {
+    return Math.random().toString(36).substring(2, 10).toUpperCase();
+};
+
+const sendVerificationEmail = async (email, token) => {
+    const verificationUrl = `${process.env.FRONTEND_URL || 'http://localhost:8000'}/verify-email?token=${token}`;
+    await transporter.sendMail({
+        from: process.env.EMAIL_FROM || 'noreply@tradingmastery.com',
+        to: email,
+        subject: 'Verify Your Trading Mastery Account',
+        html: `
+            <h1>Welcome to Trading Mastery!</h1>
+            <p>Please verify your email address by clicking the link below:</p>
+            <a href="${verificationUrl}">Verify Email</a>
+            <p>This link will expire in 24 hours.</p>
+        `
+    });
+};
+
+// Email Verification Routes
+app.post('/api/auth/verify-email', async (req, res) => {
+    const { token } = req.body;
+    
+    db.get('SELECT * FROM users WHERE verification_token = ?', [token], (err, user) => {
+        if (err || !user) {
+            return res.status(400).json({ error: 'Invalid or expired verification token' });
+        }
+        
+        db.run('UPDATE users SET is_verified = 1, verification_token = NULL WHERE id = ?', [user.id], (err) => {
+            if (err) {
+                return res.status(500).json({ error: 'Database error' });
+            }
+            res.json({ message: 'Email verified successfully' });
+        });
+    });
+});
+
+app.post('/api/auth/resend-verification', async (req, res) => {
+    const { email } = req.body;
+    
+    db.get('SELECT * FROM users WHERE email = ?', [email], async (err, user) => {
+        if (err || !user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+        
+        if (user.is_verified) {
+            return res.status(400).json({ error: 'Email already verified' });
+        }
+        
+        const token = generateVerificationToken();
+        db.run('UPDATE users SET verification_token = ? WHERE id = ?', [token, user.id], async (err) => {
+            if (err) {
+                return res.status(500).json({ error: 'Database error' });
+            }
+            
+            try {
+                await sendVerificationEmail(email, token);
+                res.json({ message: 'Verification email sent' });
+            } catch (error) {
+                res.status(500).json({ error: 'Failed to send email' });
+            }
+        });
+    });
+});
+
+// Two-Factor Authentication Routes
+app.post('/api/auth/enable-2fa', authenticateToken, (req, res) => {
+    const userId = req.user.userId;
+    const secret = speakeasy.generateSecret({ length: 20 });
+    
+    db.run('UPDATE users SET two_factor_secret = ? WHERE id = ?', [secret.base32, userId], (err) => {
+        if (err) {
+            return res.status(500).json({ error: 'Database error' });
+        }
+        
+        qrcode.toDataURL(secret.otpauth_url, (err, qrCode) => {
+            if (err) {
+                return res.status(500).json({ error: 'Failed to generate QR code' });
+            }
+            res.json({ secret: secret.base32, qrCode });
+        });
+    });
+});
+
+app.post('/api/auth/verify-2fa', authenticateToken, (req, res) => {
+    const userId = req.user.userId;
+    const { token } = req.body;
+    
+    db.get('SELECT two_factor_secret FROM users WHERE id = ?', [userId], (err, user) => {
+        if (err || !user || !user.two_factor_secret) {
+            return res.status(400).json({ error: '2FA not set up' });
+        }
+        
+        const verified = speakeasy.totp.verify({
+            secret: user.two_factor_secret,
+            encoding: 'base32',
+            token: token
+        });
+        
+        if (verified) {
+            db.run('UPDATE users SET two_factor_enabled = 1 WHERE id = ?', [userId], (err) => {
+                if (err) {
+                    return res.status(500).json({ error: 'Database error' });
+                }
+                res.json({ message: '2FA enabled successfully' });
+            });
+        } else {
+            res.status(400).json({ error: 'Invalid token' });
+        }
+    });
+});
+
+app.post('/api/auth/disable-2fa', authenticateToken, (req, res) => {
+    const userId = req.user.userId;
+    
+    db.run('UPDATE users SET two_factor_enabled = 0, two_factor_secret = NULL WHERE id = ?', [userId], (err) => {
+        if (err) {
+            return res.status(500).json({ error: 'Database error' });
+        }
+        res.json({ message: '2FA disabled successfully' });
+    });
+});
+
+// Referral System Routes
+app.post('/api/referral/apply', authenticateToken, (req, res) => {
+    const userId = req.user.userId;
+    const { referralCode } = req.body;
+    
+    db.get('SELECT * FROM users WHERE referral_code = ?', [referralCode], (err, referrer) => {
+        if (err || !referrer) {
+            return res.status(404).json({ error: 'Invalid referral code' });
+        }
+        
+        if (referrer.id === userId) {
+            return res.status(400).json({ error: 'Cannot refer yourself' });
+        }
+        
+        db.run('UPDATE users SET referred_by = ? WHERE id = ?', [referrer.id, userId], (err) => {
+            if (err) {
+                return res.status(500).json({ error: 'Database error' });
+            }
+            
+            db.run('INSERT INTO referrals (referrer_id, referred_user_id) VALUES (?, ?)', [referrer.id, userId], (err) => {
+                if (err) {
+                    return res.status(500).json({ error: 'Database error' });
+                }
+                res.json({ message: 'Referral applied successfully' });
+            });
+        });
+    });
+});
+
+app.get('/api/referral/stats', authenticateToken, (req, res) => {
+    const userId = req.user.userId;
+    
+    db.all('SELECT * FROM referrals WHERE referrer_id = ?', [userId], (err, referrals) => {
+        if (err) {
+            return res.status(500).json({ error: 'Database error' });
+        }
+        
+        const totalCommission = referrals.reduce((sum, r) => sum + (r.commission || 0), 0);
+        res.json({
+            totalReferrals: referrals.length,
+            totalCommission: totalCommission,
+            referrals: referrals
+        });
+    });
+});
+
+// Payment Integration Routes
+app.post('/api/payment/create-checkout', authenticateToken, async (req, res) => {
+    const { tier } = req.body;
+    
+    const prices = {
+        professional: 2900,
+        elite: 9900
+    };
+    
+    const price = prices[tier];
+    if (!price) {
+        return res.status(400).json({ error: 'Invalid subscription tier' });
+    }
+    
+    try {
+        const session = await stripeClient.checkout.sessions.create({
+            payment_method_types: ['card'],
+            line_items: [{
+                price_data: {
+                    currency: 'usd',
+                    product_data: {
+                        name: `Trading Mastery ${tier.charAt(0).toUpperCase() + tier.slice(1)} Plan`,
+                    },
+                    unit_amount: price,
+                },
+                quantity: 1,
+            }],
+            mode: 'payment',
+            success_url: `${process.env.FRONTEND_URL || 'http://localhost:8000'}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `${process.env.FRONTEND_URL || 'http://localhost:8000'}/payment/cancel`,
+            metadata: {
+                userId: req.user.userId,
+                tier: tier
+            }
+        });
+        
+        res.json({ url: session.url });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.post('/api/payment/webhook', express.raw({ type: 'application/json' }), (req, res) => {
+    const sig = req.headers['stripe-signature'];
+    
+    try {
+        const event = stripeClient.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
+        
+        if (event.type === 'checkout.session.completed') {
+            const session = event.data.object;
+            const { userId, tier } = session.metadata;
+            
+            const expiresAt = new Date();
+            expiresAt.setMonth(expiresAt.getMonth() + 1);
+            
+            db.run('UPDATE users SET subscription_tier = ?, subscription_expires_at = ? WHERE id = ?', 
+                [tier, expiresAt.toISOString(), userId], (err) => {
+                if (err) {
+                    console.error('Database error:', err);
+                }
+            });
+        }
+        
+        res.json({ received: true });
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+});
+
+// Social Features Routes
+app.post('/api/strategies', authenticateToken, (req, res) => {
+    const userId = req.user.userId;
+    const { name, description, parameters, is_public } = req.body;
+    
+    db.run('INSERT INTO strategies (user_id, name, description, parameters, is_public) VALUES (?, ?, ?, ?, ?)',
+        [userId, name, description, JSON.stringify(parameters), is_public], function(err) {
+        if (err) {
+            return res.status(500).json({ error: 'Database error' });
+        }
+        res.json({ id: this.lastID, message: 'Strategy created successfully' });
+    });
+});
+
+app.get('/api/strategies', (req, res) => {
+    db.all('SELECT s.*, u.email FROM strategies s JOIN users u ON s.user_id = u.id WHERE s.is_public = 1 ORDER BY s.downloads DESC', [], (err, strategies) => {
+        if (err) {
+            return res.status(500).json({ error: 'Database error' });
+        }
+        res.json(strategies);
+    });
+});
+
+app.post('/api/follow', authenticateToken, (req, res) => {
+    const followerId = req.user.userId;
+    const { followingId } = req.body;
+    
+    if (followerId === followingId) {
+        return res.status(400).json({ error: 'Cannot follow yourself' });
+    }
+    
+    db.run('INSERT INTO follows (follower_id, following_id) VALUES (?, ?)', [followerId, followingId], (err) => {
+        if (err) {
+            if (err.message.includes('UNIQUE')) {
+                return res.status(400).json({ error: 'Already following this user' });
+            }
+            return res.status(500).json({ error: 'Database error' });
+        }
+        res.json({ message: 'User followed successfully' });
+    });
+});
+
+app.delete('/api/follow/:id', authenticateToken, (req, res) => {
+    const followerId = req.user.userId;
+    const followingId = req.params.id;
+    
+    db.run('DELETE FROM follows WHERE follower_id = ? AND following_id = ?', [followerId, followingId], (err) => {
+        if (err) {
+            return res.status(500).json({ error: 'Database error' });
+        }
+        res.json({ message: 'User unfollowed successfully' });
+    });
+});
+
+app.get('/api/following', authenticateToken, (req, res) => {
+    const userId = req.user.userId;
+    
+    db.all(`SELECT u.id, u.email, u.profit, u.win_rate FROM follows f 
+            JOIN users u ON f.following_id = u.id 
+            WHERE f.follower_id = ?`, [userId], (err, following) => {
+        if (err) {
+            return res.status(500).json({ error: 'Database error' });
+        }
+        res.json(following);
+    });
+});
+
+// Analytics Tracking
+app.post('/api/analytics/track', (req, res) => {
+    const { event_type, user_id, metadata } = req.body;
+    
+    db.run('INSERT INTO analytics (event_type, user_id, metadata) VALUES (?, ?, ?)',
+        [event_type, user_id, JSON.stringify(metadata)], (err) => {
+        if (err) {
+            return res.status(500).json({ error: 'Database error' });
+        }
+        res.json({ message: 'Analytics tracked successfully' });
+    });
+});
+
+// Leaderboard Route
+app.get('/api/leaderboard', (req, res) => {
+    db.all('SELECT id, email, profit, win_rate, total_trades FROM users ORDER BY profit DESC LIMIT 50', [], (err, leaderboard) => {
+        if (err) {
+            return res.status(500).json({ error: 'Database error' });
+        }
+        res.json(leaderboard);
+    });
+});
+
+// Admin Dashboard Routes
+app.get('/api/admin/users', authenticateToken, (req, res) => {
+    db.all('SELECT id, email, is_verified, subscription_tier, profit, win_rate, total_trades, created_at FROM users', [], (err, users) => {
+        if (err) {
+            return res.status(500).json({ error: 'Database error' });
+        }
+        res.json(users);
+    });
+});
+
+app.put('/api/admin/user/:id', authenticateToken, (req, res) => {
+    const { id } = req.params;
+    const { subscription_tier, is_verified } = req.body;
+    
+    db.run('UPDATE users SET subscription_tier = ?, is_verified = ? WHERE id = ?', 
+        [subscription_tier, is_verified, id], (err) => {
+        if (err) {
+            return res.status(500).json({ error: 'Database error' });
+        }
+        res.json({ message: 'User updated successfully' });
+    });
+});
+
+app.get('/api/admin/analytics', authenticateToken, (req, res) => {
+    db.all('SELECT event_type, COUNT(*) as count, created_at FROM analytics GROUP BY event_type ORDER BY created_at DESC LIMIT 100', [], (err, analytics) => {
+        if (err) {
+            return res.status(500).json({ error: 'Database error' });
+        }
+        
+        db.get('SELECT COUNT(*) as total_users FROM users', [], (err, userCount) => {
+            if (err) {
+                return res.status(500).json({ error: 'Database error' });
+            }
+            
+            res.json({
+                analytics: analytics,
+                totalUsers: userCount.total_users
+            });
+        });
+    });
+});
+
 // JWT middleware
 const authenticateToken = (req, res, next) => {
   const authHeader = req.headers['authorization'];
@@ -154,7 +555,7 @@ const authenticateToken = (req, res, next) => {
 
 // Auth routes
 app.post('/api/auth/register', async (req, res) => {
-  const { email, password, name } = req.body;
+  const { email, password, name, referralCode } = req.body;
   
   if (!email || !password || !name) {
     return res.status(400).json({ error: 'All fields required' });
@@ -163,11 +564,13 @@ app.post('/api/auth/register', async (req, res) => {
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
     const userId = uuidv4();
+    const verificationToken = generateVerificationToken();
+    const userReferralCode = generateReferralCode();
     
     db.run(
-      'INSERT INTO users (id, email, password, name) VALUES (?, ?, ?, ?)',
-      [userId, email, hashedPassword, name],
-      function(err) {
+      'INSERT INTO users (id, email, password, name, verification_token, referral_code) VALUES (?, ?, ?, ?, ?, ?)',
+      [userId, email, hashedPassword, name, verificationToken, userReferralCode],
+      async function(err) {
         if (err) {
           if (err.message.includes('UNIQUE constraint failed')) {
             return res.status(400).json({ error: 'Email already exists' });
@@ -175,8 +578,25 @@ app.post('/api/auth/register', async (req, res) => {
           return res.status(500).json({ error: 'Database error' });
         }
         
+        // Handle referral if provided
+        if (referralCode) {
+          db.get('SELECT id FROM users WHERE referral_code = ?', [referralCode], (err, referrer) => {
+            if (!err && referrer) {
+              db.run('UPDATE users SET referred_by = ? WHERE id = ?', [referrer.id, userId]);
+              db.run('INSERT INTO referrals (referrer_id, referred_user_id) VALUES (?, ?)', [referrer.id, userId]);
+            }
+          });
+        }
+        
+        // Send verification email
+        try {
+          await sendVerificationEmail(email, verificationToken);
+        } catch (error) {
+          console.error('Failed to send verification email:', error);
+        }
+        
         const token = jwt.sign({ userId, email }, JWT_SECRET, { expiresIn: '24h' });
-        res.json({ token, userId, email, name, message: 'User registered successfully' });
+        res.json({ token, userId, email, name, message: 'Registration successful. Please check your email to verify your account.', referralCode: userReferralCode });
       }
     );
   } catch (error) {
@@ -185,7 +605,7 @@ app.post('/api/auth/register', async (req, res) => {
 });
 
 app.post('/api/auth/login', (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, twoFactorToken } = req.body;
   
   if (!email || !password) {
     return res.status(400).json({ error: 'Email and password required' });
@@ -205,6 +625,23 @@ app.post('/api/auth/login', (req, res) => {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
+    // Check 2FA if enabled
+    if (user.two_factor_enabled) {
+      if (!twoFactorToken) {
+        return res.status(200).json({ requiresTwoFactor: true });
+      }
+      
+      const verified = speakeasy.totp.verify({
+        secret: user.two_factor_secret,
+        encoding: 'base32',
+        token: twoFactorToken
+      });
+      
+      if (!verified) {
+        return res.status(401).json({ error: 'Invalid 2FA token' });
+      }
+    }
+
     const token = jwt.sign(
       { userId: user.id, email: user.email },
       JWT_SECRET,
@@ -218,7 +655,9 @@ app.post('/api/auth/login', (req, res) => {
       name: user.name,
       balance: user.balance,
       demo_balance: user.demo_balance,
-      is_demo: user.is_demo
+      is_demo: user.is_demo,
+      is_verified: user.is_verified,
+      referral_code: user.referral_code
     });
   });
 });

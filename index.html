@@ -1130,40 +1130,42 @@
                     <h2 class="section-title">Choose Your Path to Success</h2>
                     <div class="pricing-grid">
                         <div class="pricing-card">
-                            <h3>Starter</h3>
-                            <div class="price">$99<span>/month</span></div>
+                            <h3>Free</h3>
+                            <div class="price">$0<span>/forever</span></div>
                             <ul>
                                 <li>Basic trading strategies</li>
-                                <li>Weekly webinars</li>
                                 <li>Community access</li>
                                 <li>Email support</li>
+                                <li>Public strategies</li>
                             </ul>
-                            <button class="btn btn-outline pricing-btn" data-plan="Starter">Get Started</button>
+                            <button class="btn btn-outline pricing-btn" data-plan="free">Get Started</button>
                         </div>
                         <div class="pricing-card featured">
                             <div class="popular-badge">Most Popular</div>
                             <h3>Professional</h3>
-                            <div class="price">$299<span>/month</span></div>
+                            <div class="price">$29<span>/month</span></div>
                             <ul>
                                 <li>Advanced strategies</li>
                                 <li>Daily live sessions</li>
                                 <li>1-on-1 mentorship</li>
                                 <li>Priority support</li>
                                 <li>Trading tools access</li>
+                                <li>Strategy marketplace</li>
                             </ul>
-                            <button class="btn btn-primary pricing-btn" data-plan="Professional">Get Started</button>
+                            <button class="btn btn-primary pricing-btn" data-plan="professional" data-price="2900">Subscribe Now</button>
                         </div>
                         <div class="pricing-card">
                             <h3>Elite</h3>
-                            <div class="price">$999<span>/month</span></div>
+                            <div class="price">$99<span>/month</span></div>
                             <ul>
                                 <li>All Professional features</li>
                                 <li>Custom strategies</li>
                                 <li>Direct mentor access</li>
                                 <li>API access</li>
                                 <li>White-label solutions</li>
+                                <li>Unlimited bot trading</li>
                             </ul>
-                            <button class="btn btn-outline pricing-btn" data-plan="Elite">Get Started</button>
+                            <button class="btn btn-outline pricing-btn" data-plan="elite" data-price="9900">Subscribe Now</button>
                         </div>
                     </div>
                 </div>
@@ -1256,19 +1258,32 @@
                                         <div class="value">78%</div>
                                     </div>
                                     <div class="stat-card">
-                                        <h3>Active Bots</h3>
-                                        <div class="value">5</div>
-                                    </div>
-                                    <div class="stat-card">
                                         <h3>Total Trades</h3>
                                         <div class="value">1,234</div>
                                     </div>
+                                    <div class="stat-card">
+                                        <h3>Active Bots</h3>
+                                        <div class="value">3</div>
+                                    </div>
                                 </div>
-                                <div class="trading-chart">
+                                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-top: 30px;">
                                     <div>
                                         <h3>Trading Performance Chart</h3>
                                         <p>Real-time trading analytics will appear here</p>
                                         <button class="btn btn-primary dashboard-action-btn" data-action="connect-account" style="margin-top: 20px;">Connect Trading Account</button>
+                                    </div>
+                                    <div style="background: #1a1a2e; padding: 20px; border-radius: 12px;">
+                                        <h3>Referral Program</h3>
+                                        <p style="color: #a0a0a0; margin-bottom: 15px;">Share your referral code and earn commissions!</p>
+                                        <div style="background: #0f0f1a; padding: 15px; border-radius: 8px; margin-bottom: 15px; text-align: center;">
+                                            <div style="font-size: 1.5rem; color: #4a90e2; font-weight: bold; letter-spacing: 2px;" id="referralCode">TRADER123</div>
+                                        </div>
+                                        <button class="btn btn-primary" style="width: 100%; margin-bottom: 10px;" onclick="copyReferralCode()">Copy Code</button>
+                                        <button class="btn btn-secondary" style="width: 100%;">Share Link</button>
+                                        <div style="margin-top: 15px; font-size: 0.85rem; color: #a0a0a0;">
+                                            <div>Total Referrals: <span style="color: #50c878;">12</span></div>
+                                            <div>Commission Earned: <span style="color: #50c878;">$245.00</span></div>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="positions-panel" style="background: #1a1a2e; border-radius: 12px; padding: 20px; margin-top: 20px;">
@@ -1423,6 +1438,30 @@
                                             <input type="email" value="john@example.com" style="width: 100%; padding: 10px; background: #0f0f1a; border: 1px solid #333; border-radius: 8px; color: white; box-sizing: border-box;">
                                         </div>
                                         <button class="btn btn-primary settings-action-btn" data-action="save-profile">Save Changes</button>
+                                    </div>
+                                    <div style="background: #1a1a2e; padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+                                        <h4 style="margin-bottom: 15px;">Two-Factor Authentication (2FA)</h4>
+                                        <div style="margin-bottom: 15px;">
+                                            <p style="color: #a0a0a0; margin-bottom: 15px;">Add an extra layer of security to your account with 2FA.</p>
+                                            <div id="twoFactorStatus" style="margin-bottom: 15px;">
+                                                <span style="color: #f44336;">2FA is not enabled</span>
+                                            </div>
+                                            <button class="btn btn-primary settings-action-btn" data-action="enable-2fa" id="enable2faBtn">Enable 2FA</button>
+                                            <button class="btn btn-secondary settings-action-btn" data-action="disable-2fa" id="disable2faBtn" style="display: none; border-color: #f44336; color: #f44336;">Disable 2FA</button>
+                                        </div>
+                                        <div id="twoFactorSetup" style="display: none; margin-top: 20px; padding-top: 20px; border-top: 1px solid #333;">
+                                            <h5 style="margin-bottom: 15px; color: #4a90e2;">Setup 2FA</h5>
+                                            <p style="color: #a0a0a0; margin-bottom: 15px;">1. Download Google Authenticator or Authy app</p>
+                                            <p style="color: #a0a0a0; margin-bottom: 15px;">2. Scan the QR code below</p>
+                                            <div id="qrCodeContainer" style="background: white; padding: 20px; border-radius: 8px; display: inline-block; margin-bottom: 15px;">
+                                                <div style="width: 150px; height: 150px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; color: #333;">QR Code</div>
+                                            </div>
+                                            <p style="color: #a0a0a0; margin-bottom: 15px;">3. Enter the 6-digit code from the app</p>
+                                            <div style="margin-bottom: 15px;">
+                                                <input type="text" id="twoFactorToken" placeholder="Enter 6-digit code" maxlength="6" style="width: 100%; padding: 10px; background: #0f0f1a; border: 1px solid #333; border-radius: 8px; color: white; box-sizing: border-box;">
+                                            </div>
+                                            <button class="btn btn-primary settings-action-btn" data-action="verify-2fa">Verify & Enable</button>
+                                        </div>
                                     </div>
                                     <div style="background: #1a1a2e; padding: 20px; border-radius: 12px; margin-bottom: 20px;">
                                         <h4 style="margin-bottom: 15px;">Trading Preferences</h4>
