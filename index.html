@@ -3239,6 +3239,150 @@ document.addEventListener('DOMContentLoaded', function() {
     // Set up periodic updates
     setInterval(updateDashboard, 5000);
     
+    // Copy referral code function
+    window.copyReferralCode = function() {
+        const referralCode = document.getElementById('referralCode').textContent;
+        navigator.clipboard.writeText(referralCode).then(() => {
+            alert('Referral code copied to clipboard!');
+        }).catch(err => {
+            console.error('Failed to copy:', err);
+        });
+    };
+    
+    // 2FA setup handlers
+    const enable2faBtn = document.getElementById('enable2faBtn');
+    const disable2faBtn = document.getElementById('disable2faBtn');
+    const twoFactorSetup = document.getElementById('twoFactorSetup');
+    
+    if (enable2faBtn) {
+        enable2faBtn.addEventListener('click', async function() {
+            try {
+                const response = await fetch('https://lian-traders-api.onrender.com/api/auth/enable-2fa', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                const data = await response.json();
+                
+                if (response.ok) {
+                    document.getElementById('qrCodeContainer').innerHTML = `<img src="${data.qrCode}" alt="QR Code" style="width: 150px; height: 150px;">`;
+                    twoFactorSetup.style.display = 'block';
+                    enable2faBtn.style.display = 'none';
+                } else {
+                    alert(data.error || 'Failed to enable 2FA');
+                }
+            } catch (error) {
+                console.error('Error enabling 2FA:', error);
+                alert('Failed to enable 2FA');
+            }
+        });
+    }
+    
+    if (disable2faBtn) {
+        disable2faBtn.addEventListener('click', async function() {
+            try {
+                const response = await fetch('https://lian-traders-api.onrender.com/api/auth/disable-2fa', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                const data = await response.json();
+                
+                if (response.ok) {
+                    document.getElementById('twoFactorStatus').innerHTML = '<span style="color: #f44336;">2FA is not enabled</span>';
+                    disable2faBtn.style.display = 'none';
+                    enable2faBtn.style.display = 'inline-block';
+                    twoFactorSetup.style.display = 'none';
+                } else {
+                    alert(data.error || 'Failed to disable 2FA');
+                }
+            } catch (error) {
+                console.error('Error disabling 2FA:', error);
+                alert('Failed to disable 2FA');
+            }
+        });
+    }
+    
+    document.querySelectorAll('.settings-action-btn').forEach(btn => {
+        btn.addEventListener('click', async function() {
+            const action = this.getAttribute('data-action');
+            
+            if (action === 'verify-2fa') {
+                const token = document.getElementById('twoFactorToken').value;
+                try {
+                    const response = await fetch('https://lian-traders-api.onrender.com/api/auth/verify-2fa', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${authToken}`
+                        },
+                        body: JSON.stringify({ token })
+                    });
+                    const data = await response.json();
+                    
+                    if (response.ok) {
+                        document.getElementById('twoFactorStatus').innerHTML = '<span style="color: #4caf50;">2FA is enabled</span>';
+                        twoFactorSetup.style.display = 'none';
+                        disable2faBtn.style.display = 'inline-block';
+                        alert('2FA enabled successfully!');
+                    } else {
+                        alert(data.error || 'Invalid token');
+                    }
+                } catch (error) {
+                    console.error('Error verifying 2FA:', error);
+                    alert('Failed to verify 2FA');
+                }
+            }
+        });
+    });
+    
+    // Pricing button handlers
+    document.querySelectorAll('.pricing-btn').forEach(btn => {
+        btn.addEventListener('click', async function() {
+            const plan = this.getAttribute('data-plan');
+            const price = this.getAttribute('data-price');
+            
+            if (plan === 'free') {
+                if (!authToken) {
+                    showSignupModal();
+                } else {
+                    navigateTo('dashboard');
+                }
+                return;
+            }
+            
+            if (!authToken) {
+                showSignupModal();
+                return;
+            }
+            
+            try {
+                const response = await fetch('https://lian-traders-api.onrender.com/api/payment/create-checkout', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({ tier: plan })
+                });
+                const data = await response.json();
+                
+                if (response.ok) {
+                    window.location.href = data.url;
+                } else {
+                    alert(data.error || 'Failed to create checkout session');
+                }
+            } catch (error) {
+                console.error('Error creating checkout:', error);
+                alert('Failed to create checkout session');
+            }
+        });
+    });
+    
     // Copy trading button handlers
     document.querySelectorAll('.copy-trading-btn').forEach(btn => {
         btn.addEventListener('click', function() {
